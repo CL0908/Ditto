@@ -25,7 +25,7 @@ test:
 
 deploy:
 	@test -n "$(PRIVATE_KEY)" || (echo "Set PRIVATE_KEY in .env or your shell." && exit 1)
-	forge create src/Counter.sol:Counter \
+	forge create src/SentinelAnchor.sol:SentinelAnchor \
 		--rpc-url "$(RPC_URL)" \
 		--private-key "$(PRIVATE_KEY)" \
 		--legacy \
@@ -40,14 +40,15 @@ verify:
 		--verifier blockscout \
 		--verifier-url "$(VERIFIER_URL)" \
 		"$(CONTRACT_ADDRESS)" \
-		src/Counter.sol:Counter
+		src/SentinelAnchor.sol:SentinelAnchor
 
 interact-read:
 	@test -n "$(CONTRACT_ADDRESS)" || (echo "Set CONTRACT_ADDRESS in .env or your shell." && exit 1)
 	cast call \
 		--rpc-url "$(RPC_URL)" \
 		"$(CONTRACT_ADDRESS)" \
-		"value()(uint256)"
+		"checkpointCount(address)(uint256)" \
+		"$(shell cast wallet address --private-key $(PRIVATE_KEY))"
 
 interact-write:
 	@test -n "$(PRIVATE_KEY)" || (echo "Set PRIVATE_KEY in .env or your shell." && exit 1)
@@ -59,5 +60,6 @@ interact-write:
 		--gas-price "$(GAS_PRICE)" \
 		--gas-limit "$(GAS_LIMIT)" \
 		"$(CONTRACT_ADDRESS)" \
-		"increment(uint256)" \
-		"$(INCREMENT_AMOUNT)"
+		"anchor(bytes32,uint256)" \
+		"0x0000000000000000000000000000000000000000000000000000000000000000" \
+		"0"
