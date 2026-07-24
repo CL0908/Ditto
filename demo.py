@@ -13,6 +13,8 @@ from pathlib import Path
 
 from alert_chain import AlertChain, anchor_to_chain
 import mindreset_quote as quote
+import voice_alert as voice
+import explain
 
 
 def _severity(score):
@@ -43,6 +45,9 @@ def main():
     # 告警输出屏（Quote/0）：未配置 DOT_* 时自动 MOCK（打印不真发）
     quote.configure(env.get("DOT_API_KEY", ""), env.get("DOT_DEVICE_ID", ""),
                     env.get("DASHBOARD_URL", ""))
+    # 语音播报：预渲染真人音色优先，缺则 say 兜底；VOICE_ENABLED=0 则静音
+    voice.configure(env.get("VOICE_ENABLED", "1") not in ("0", "false", ""),
+                    env.get("VOICE_LANG", "zh"))
 
     print("=" * 70)
     print("SENTINEL — Tamper-Evident Alert Anchoring Demo")
@@ -64,16 +69,20 @@ def main():
         flag = "ANOMALY" if anomaly_type != "normal" else "normal "
         print(f"  #{record['index']} [{flag}] {device_id:22s} {anomaly_type:20s} "
               f"score={score:.2f} hash={record['hash'][:16]}...")
-        # 异常 → 推到 Quote/0 电子墨水屏（脱敏摘要）
+        # 异常 → 同一瞬间：①墨水屏红色告警 ②语音播报一句人话（都只发脱敏摘要）
         if anomaly_type != "normal":
+            sev = _severity(score)
             quote.push_anomaly_alert(
                 device_name=device_id,
                 event_type=anomaly_type.replace("_", " "),
                 risk_score=int(score * 100),
-                severity=_severity(score),
+                severity=sev,
                 incident_id=f"INC-{record['index']:04d}",
                 timestamp=str(record.get("timestamp", "")),
             )
+            spoken = explain.explain_anomaly(device_id, anomaly_type, score)
+            print(f"       🔊 {spoken}")
+            voice.speak_anomaly(spoken, sev, explain.clip_key(anomaly_type))
 
     is_valid, error = chain.verify()
     print(f"\n  Chain integrity check: {'OK' if is_valid else 'FAILED — ' + error}")
@@ -105,8 +114,9 @@ def main():
     status = "SUCCESS" if result["status"] == 1 else "FAILED"
     print(f"  Status:       {status}")
     if result["status"] == 1:
-        # 哈希锚链成功 → Quote/0 显示存证完成
+        # 哈希锚链成功 → Quote/0 显示存证完成 + 语音收尾
         quote.push_evidence_sealed(f"chk-{result.get('checkpoint_index', 0)}")
+        voice.speak_evidence_sealed(explain.explain_evidence_sealed())
     print(f"  Tx hash:      {result['tx_hash']}")
     if result["block_number"] is not None:
         print(f"  Block:        {result['block_number']}")
@@ -128,6 +138,8 @@ def main():
     print("Done. The Merkle root above commits to all 5 alerts above;")
     print("any modification to any alert changes the root and breaks verify().")
     print("=" * 70)
+
+    voice.wait()   # 等语音播完再退出，别截断最后一句
 
 
 if __name__ == "__main__":
