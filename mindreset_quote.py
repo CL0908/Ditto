@@ -154,12 +154,45 @@ def push_normal_status(device_count: int, security_score: int, last_checked: str
     })
 
 
+def push_dashboard(snapshot: dict) -> bool:
+    """实时安全仪表盘 —— 平时的 Quote/0 界面：设备数 / 安全分 / 实时流量 / 状态。
+
+    snapshot 来自 traffic_sim.HomeTraffic.snapshot()（已聚合脱敏）：
+      device_count, security_score, total_human, top_talker, top_talker_human,
+      status, last_checked
+    正常时刷（dedup 生效）；异常态下会被 push_anomaly_alert 的红屏盖过。
+    """
+    status = snapshot.get("status", "正常")
+    normal = snapshot.get("anomaly_count", 0) == 0
+    icon = "🛡" if normal else "⚠"
+    tag = "✓ 全部正常" if normal else f"⚠ {status}"
+    return _post(_text_url(), {
+        "title": f"{icon} HOME SHIELD",
+        "message": (
+            f"{snapshot.get('device_count', 0)} 台设备在线\n"
+            f"安全分 {snapshot.get('security_score', 0)}/100\n"
+            f"↕ 实时流量 {snapshot.get('total_human', '—')}\n"
+            f"{tag}"
+        ),
+        "signature": (
+            f"最忙 {snapshot.get('top_talker', '—')} "
+            f"{snapshot.get('top_talker_human', '')} · {snapshot.get('last_checked', '')}"
+        ),
+        "refreshNow": True,
+    })
+
+
 def push_anomaly_alert(device_name: str, event_type: str, risk_score: int,
-                       severity: str, incident_id: str, timestamp: str) -> bool:
+                       severity: str, incident_id: str, timestamp: str,
+                       traffic_line: str = "") -> bool:
     sev = (severity or "").upper()
+    # 异常翻红时补一行流量尖峰（脱敏聚合），让屏上“看得见被检测的流量”
+    body = f"{device_name}\n{event_type}\n\nRisk: {sev} · {risk_score}/100"
+    if traffic_line:
+        body += f"\n{traffic_line}"
     return _post(_text_url(), {
         "title": f"⚠ {sev} ANOMALY",
-        "message": f"{device_name}\n{event_type}\n\nRisk: {sev} · {risk_score}/100",
+        "message": body,
         "signature": f"{incident_id} · {timestamp}",
         "link": (f"{DASHBOARD_URL}/incident/{incident_id}" if DASHBOARD_URL else None),
         "refreshNow": True,

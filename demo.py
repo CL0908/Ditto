@@ -15,6 +15,8 @@ from alert_chain import AlertChain, anchor_to_chain
 import mindreset_quote as quote
 import voice_alert as voice
 import explain
+import t5_bridge as t5
+from traffic_sim import HomeTraffic, spike_line
 
 
 def _severity(score):
@@ -48,10 +50,19 @@ def main():
     # 语音播报：预渲染真人音色优先，缺则 say 兜底；VOICE_ENABLED=0 则静音
     voice.configure(env.get("VOICE_ENABLED", "1") not in ("0", "false", ""),
                     env.get("VOICE_LANG", "zh"))
+    # T5 DevKit 板载喇叭：串口发 clip 键→板子播烧入的真人声；未连/未就绪自动 no-op
+    t5.configure(env.get("T5_PORT", ""), int(env.get("T5_BAUD", "115200") or 115200),
+                 env.get("T5_ENABLED", "1") not in ("0", "false", ""))
+
+    # 家庭流量态势（确定性模拟；接真设备时换数据源即可）
+    traffic = HomeTraffic()
 
     print("=" * 70)
     print("SENTINEL — Tamper-Evident Alert Anchoring Demo")
     print("=" * 70)
+
+    # 平时的 Quote/0 界面：实时安全仪表盘（设备/安全分/流量）
+    quote.push_dashboard(traffic.snapshot("start"))
 
     # 1. Simulate 5 anomaly-detection events (mix of normal + attack types)
     simulated_events = [
@@ -69,20 +80,31 @@ def main():
         flag = "ANOMALY" if anomaly_type != "normal" else "normal "
         print(f"  #{record['index']} [{flag}] {device_id:22s} {anomaly_type:20s} "
               f"score={score:.2f} hash={record['hash'][:16]}...")
-        # 异常 → 同一瞬间：①墨水屏红色告警 ②语音播报一句人话（都只发脱敏摘要）
-        if anomaly_type != "normal":
-            sev = _severity(score)
-            quote.push_anomaly_alert(
-                device_name=device_id,
-                event_type=anomaly_type.replace("_", " "),
-                risk_score=int(score * 100),
-                severity=sev,
-                incident_id=f"INC-{record['index']:04d}",
-                timestamp=str(record.get("timestamp", "")),
-            )
-            spoken = explain.explain_anomaly(device_id, anomaly_type, score)
-            print(f"       🔊 {spoken}")
-            voice.speak_anomaly(spoken, sev, explain.clip_key(anomaly_type))
+        # 每个事件都更新流量态势；正常事件顺带刷新仪表盘
+        kbps = traffic.observe(device_id, anomaly_type, score)
+        if anomaly_type == "normal":
+            quote.push_dashboard(traffic.snapshot(str(record.get("timestamp", ""))))
+            continue
+
+        # 异常 → 同一瞬间四路扇出（都只发脱敏摘要）：
+        #   ①墨水屏红色告警+流量尖峰 ②刷新流量仪表盘 ③T5 板载喇叭真人声 ④Mac say 兜底
+        sev = _severity(score)
+        clip = explain.clip_key(anomaly_type)
+        traffic_line = spike_line(device_id, kbps, None)
+        quote.push_anomaly_alert(
+            device_name=device_id,
+            event_type=anomaly_type.replace("_", " "),
+            risk_score=int(score * 100),
+            severity=sev,
+            incident_id=f"INC-{record['index']:04d}",
+            timestamp=str(record.get("timestamp", "")),
+            traffic_line=traffic_line,
+        )
+        quote.push_dashboard(traffic.snapshot(str(record.get("timestamp", ""))))
+        spoken = explain.explain_anomaly(device_id, anomaly_type, score)
+        print(f"       🔊 {spoken}  [{traffic_line}]")
+        t5.speak_anomaly(clip, sev)          # T5 板子亲口播（发 clip 键）
+        voice.speak_anomaly(spoken, sev, clip)  # Mac 兜底（T5 没就绪时也有声）
 
     is_valid, error = chain.verify()
     print(f"\n  Chain integrity check: {'OK' if is_valid else 'FAILED — ' + error}")
