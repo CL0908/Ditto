@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#F1ECFA">
+<title>试玩 Ditto · 点一下，看它怎么反应</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   这个页面是完全自包含的单文件——不依赖 style.css / app.js。
+   目的：扫码就能打开，少一个文件就少一个出错的可能。
+   ============================================================ */
+:root{
+  --lilac:#F1ECFA; --lilac-2:#E4DAF5;
+  --purple-300:#B39DDB; --purple-500:#7C5CBF;
+  --purple-700:#5B3E96; --purple-900:#3D2B63;
+  --ink:#261C40; --gray:#6E6580;
+  --warm:#E85A6B; --green:#4C9A7D; --amber:#E0A33E;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{
+  font-family:'Noto Sans SC',-apple-system,sans-serif;
+  background:radial-gradient(circle, rgba(124,92,191,.14) 2px, transparent 2.4px) 0 0/30px 30px, var(--lilac);
+  color:var(--ink); min-height:100vh;
+  padding-bottom:230px; /* 给底部 Ditto 面板留位置 */
+  overflow-x:hidden;
+}
+
+/* ---------- 顶部 ---------- */
+header{padding:26px 22px 14px;text-align:center}
+.brand{
+  font-family:'Fredoka',sans-serif;font-weight:700;font-size:19px;
+  color:var(--purple-900);letter-spacing:.06em;
+  display:inline-flex;align-items:center;gap:8px;
+}
+.brand .dot{width:10px;height:10px;border-radius:50%;background:var(--warm)}
+h1{font-size:23px;font-weight:900;color:var(--purple-900);margin:14px 0 8px;line-height:1.35}
+.sub{font-size:13.5px;color:var(--gray);line-height:1.7;max-width:330px;margin:0 auto}
+
+/* ---------- 声音开关 ---------- */
+.sound-toggle{
+  display:inline-flex;align-items:center;gap:7px;
+  margin-top:16px;padding:8px 16px;border-radius:999px;
+  background:#fff;border:1.5px solid rgba(124,92,191,.25);
+  font-size:12.5px;font-weight:700;color:var(--purple-700);
+  cursor:pointer;font-family:inherit;
+}
+.sound-toggle.off{color:var(--gray);background:transparent}
+
+/* ---------- 房间 ---------- */
+.room-label{
+  display:flex;align-items:center;gap:10px;
+  padding:0 22px;margin:26px 0 14px;
+  font-size:11.5px;font-weight:700;letter-spacing:.18em;
+  color:var(--purple-500);text-transform:uppercase;
+}
+.room-label::before{content:"";width:22px;height:2px;background:var(--warm)}
+.room-label .count{margin-left:auto;letter-spacing:0;text-transform:none;color:var(--gray);font-size:11px}
+
+.devices{
+  display:grid;grid-template-columns:1fr 1fr;gap:13px;padding:0 18px;
+}
+.device{
+  background:#fff;border:1.5px solid rgba(124,92,191,.16);
+  border-radius:22px;padding:20px 15px 17px;
+  text-align:center;cursor:pointer;position:relative;
+  transition:transform .3s cubic-bezier(.34,1.56,.64,1), border-color .3s, background .3s;
+  overflow:hidden;
+}
+.device:active{transform:scale(.95)}
+.device .ico{font-size:34px;line-height:1;margin-bottom:9px;display:block;transition:transform .3s}
+.device .name{font-size:14px;font-weight:700;color:var(--purple-900);margin-bottom:4px}
+.device .state{font-size:11.5px;color:var(--green);font-weight:700;display:flex;align-items:center;justify-content:center;gap:5px}
+.device .state .led{width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block}
+.device .hint{
+  font-size:10.5px;color:var(--purple-300);margin-top:9px;
+  font-family:'Fredoka',sans-serif;font-weight:600;
+}
+
+/* 被攻击中的状态 */
+.device.hacked{
+  border-color:var(--warm);background:#FFF5F5;
+  animation:shake .4s ease;
+}
+.device.hacked .state{color:var(--warm)}
+.device.hacked .state .led{background:var(--warm);animation:blink .6s infinite}
+.device.hacked .ico{transform:scale(1.12) rotate(-6deg)}
+/* 已被隔离 */
+.device.isolated{border-color:var(--purple-300);background:#FAFAFC;opacity:.7}
+.device.isolated .state{color:var(--purple-500)}
+.device.isolated .state .led{background:var(--purple-500)}
+.device.isolated .ico{filter:grayscale(1);transform:none}
+
+@keyframes shake{
+  0%,100%{transform:translateX(0)}
+  20%{transform:translateX(-6px)} 40%{transform:translateX(6px)}
+  60%{transform:translateX(-4px)} 80%{transform:translateX(4px)}
+}
+@keyframes blink{50%{opacity:.25}}
+
+/* 隔离时盖上的胶带 */
+.seal{
+  position:absolute;top:50%;left:-14%;width:128%;
+  background:var(--purple-900);color:#fff;
+  font-family:'Fredoka',sans-serif;font-weight:600;font-size:10.5px;
+  letter-spacing:.16em;text-align:center;padding:4px 0;
+  transform:translateY(-50%) rotate(-9deg);
+  opacity:0;transition:opacity .35s;pointer-events:none;
+}
+.device.isolated .seal{opacity:1}
+
+/* ---------- 防御日志 ---------- */
+.log-wrap{padding:0 22px;margin-top:30px}
+.log{
+  background:#fff;border:1.5px solid rgba(124,92,191,.16);
+  border-radius:20px;padding:6px 18px;
+}
+.log-empty{font-size:12.5px;color:var(--gray);text-align:center;padding:20px 6px;line-height:1.7}
+.log-item{
+  display:flex;gap:11px;align-items:flex-start;
+  padding:14px 0;border-bottom:1px dashed rgba(124,92,191,.2);
+  animation:slideIn .45s cubic-bezier(.34,1.56,.64,1);
+}
+.log-item:last-child{border-bottom:none}
+.log-item .tag{
+  flex:none;font-family:'Fredoka',sans-serif;font-weight:600;
+  font-size:10px;padding:3px 9px;border-radius:6px;margin-top:1px;
+}
+.log-item.t1 .tag{background:#FDECEA;color:var(--warm)}
+.log-item.t2 .tag{background:#F1ECFA;color:var(--purple-500)}
+.log-item.t3 .tag{background:#E7F2EE;color:var(--green)}
+.log-item .txt{font-size:12.5px;line-height:1.65;color:var(--gray)}
+.log-item .txt b{color:var(--purple-900);font-weight:700}
+@keyframes slideIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+
+/* ---------- 重置 ---------- */
+.reset-row{text-align:center;margin-top:22px;padding:0 22px}
+.reset{
+  background:none;border:none;font-family:inherit;
+  font-size:12.5px;color:var(--purple-500);font-weight:700;
+  text-decoration:underline;cursor:pointer;padding:8px;
+}
+
+/* ---------- 底部 Ditto 面板 ---------- */
+.dock{
+  position:fixed;left:0;right:0;bottom:0;z-index:50;
+  background:rgba(241,236,250,.93);
+  backdrop-filter:blur(16px);
+  border-top:1.5px solid rgba(124,92,191,.18);
+  padding:14px 18px calc(16px + env(safe-area-inset-bottom));
+  display:flex;gap:14px;align-items:flex-end;
+}
+.dock-ditto{flex:none;width:78px;position:relative}
+.dock-ditto svg{width:100%;display:block;overflow:visible}
+.bubble{
+  flex:1;background:var(--purple-900);color:#fff;
+  padding:14px 17px;border-radius:20px 20px 20px 5px;
+  font-size:13.5px;line-height:1.65;font-weight:500;
+  box-shadow:0 14px 30px -12px rgba(61,43,99,.45);
+  min-height:56px;display:flex;align-items:center;
+  transition:transform .35s cubic-bezier(.34,1.56,.64,1);
+  transform-origin:bottom left;
+}
+.bubble.pop{animation:pop .5s cubic-bezier(.34,1.56,.64,1)}
+.bubble em{color:#FFC9D1;font-style:normal;font-weight:700}
+.bubble.idle{background:#fff;color:var(--gray);border:1.5px solid rgba(124,92,191,.2);box-shadow:none}
+@keyframes pop{0%{transform:scale(.9) translateY(8px)}100%{transform:none}}
+
+.sound-arc{opacity:0}
+.dock.talking .sound-arc{animation:arcs 1.1s ease-out infinite}
+.dock.talking .sound-arc:nth-of-type(2){animation-delay:.18s}
+@keyframes arcs{0%{opacity:0;transform:translateX(-4px)}35%{opacity:1;transform:none}100%{opacity:0}}
+
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+#dittoBody{animation:float 2.6s ease-in-out infinite}
+
+/* ---------- 底部页脚 ---------- */
+.foot{
+  text-align:center;padding:26px 22px 10px;
+  font-size:11.5px;color:var(--purple-300);line-height:1.8;
+}
+.foot a{color:var(--purple-500);font-weight:700;text-decoration:none}
+
+@media(min-width:620px){
+  .devices,.log-wrap,.room-label,.reset-row{max-width:520px;margin-left:auto;margin-right:auto}
+  .room-label{margin-top:26px}
+  .dock{max-width:520px;margin:0 auto;border-radius:24px 24px 0 0;border-left:1.5px solid rgba(124,92,191,.18);border-right:1.5px solid rgba(124,92,191,.18)}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand"><span class="dot"></span>DITTO</div>
+  <h1>点一下任意设备，<br>假装它被黑了</h1>
+  <p class="sub">看看 Ditto 会怎么反应。记得把手机音量开着——它是真的会开口说话的。</p>
+  <button class="sound-toggle" id="soundBtn">🔊 语音已开启</button>
+</header>
+
+<div class="room-label">
+  你的家 · My Home
+  <span class="count" id="deviceCount">4 台设备在线</span>
+</div>
+
+<div class="devices" id="devices"><!-- JS 生成 --></div>
+
+<div class="log-wrap">
+  <div class="room-label" style="padding:0;margin:0 0 12px">Ditto 的防御日志</div>
+  <div class="log" id="log">
+    <div class="log-empty">还没有异常。<br>点上面任意一台设备试试看。</div>
+  </div>
+</div>
+
+<div class="reset-row">
+  <button class="reset" id="resetBtn">↺ 全部恢复正常</button>
+</div>
+
+<div class="foot">
+  这是一个演示原型，所有"攻击"都是模拟的<br>
+  <a href="index.html">← 回到 Ditto 主页</a>
+</div>
+
+<!-- ================= 底部 Ditto ================= -->
+<div class="dock" id="dock">
+  <div class="dock-ditto">
+    <svg viewBox="0 0 240 220" xmlns="http://www.w3.org/2000/svg" aria-label="Ditto">
+      <g id="dittoBody">
+        <path fill="#FDFBFF" stroke="#E4DAF5" stroke-width="4" d="M120 22 C74 22 44 58 44 104 C44 138 40 158 46 176 C50 188 62 190 70 180 C76 173 84 173 90 181 C96 189 108 189 114 181 C118 176 124 176 128 181 C134 189 146 189 152 181 C158 173 166 173 172 180 C180 190 192 188 196 176 C202 158 196 138 196 104 C196 58 166 22 120 22 Z"/>
+        <ellipse cx="78" cy="118" rx="12" ry="7" fill="#F3C6DE" opacity=".7"/>
+        <ellipse cx="162" cy="118" rx="12" ry="7" fill="#F3C6DE" opacity=".7"/>
+        <g id="dittoEyes">
+          <circle cx="95" cy="96" r="9" fill="#261C40"/>
+          <circle cx="145" cy="96" r="9" fill="#261C40"/>
+          <circle cx="148.5" cy="92.5" r="3" fill="#fff"/>
+        </g>
+      </g>
+      <g stroke="#7C5CBF" stroke-width="6" stroke-linecap="round" fill="none">
+        <path class="sound-arc" d="M206 84 q14 20 0 40"/>
+        <path class="sound-arc" d="M222 70 q22 34 0 68"/>
+      </g>
+    </svg>
+  </div>
+  <div class="bubble idle" id="bubble">我在守着呢，一切正常 👀</div>
+</div>
+
+<script>
+(function(){
+  /* ===== 设备与对应的攻击剧本 ===== */
+  const DEVICES = [
+    {
+      id:'cam', ico:'📷', name:'客厅摄像头',
+      attack:'正在向境外陌生地址上传画面',
+      say:'主人，客厅摄像头正在把画面偷偷传到一个境外地址。我已经把它断网了。',
+      bubble:'主人，客厅摄像头 <em>正在把画面传到境外陌生地址</em>。我已经把它断网了。',
+      logs:[
+        {t:1,tag:'攻击前',txt:'这台设备一直用的是<b>出厂默认密码</b>，我之前就标记过它有风险。'},
+        {t:2,tag:'攻击中',txt:'凌晨 3:14，它突然向一个<b>从没连过的境外 IP</b> 持续上传数据——这不是它平时的行为。'},
+        {t:3,tag:'攻击后',txt:'已把它<b>踢出家庭网络</b>，并保留了完整的连接记录。'}
+      ]
+    },
+    {
+      id:'vac', ico:'🧹', name:'扫地机器人',
+      attack:'麦克风被远程唤醒了',
+      say:'扫地机器人的麦克风被人远程打开了，但家里没人在用它。我把它隔离了。',
+      bubble:'扫地机器人的 <em>麦克风被远程打开了</em>，可是没人在用它。我把它隔离了。',
+      logs:[
+        {t:1,tag:'攻击前',txt:'它的固件<b>两年没更新</b>过了，存在已知漏洞。'},
+        {t:2,tag:'攻击中',txt:'在没有任何人操作的情况下，<b>麦克风被远程激活</b>并开始录音。'},
+        {t:3,tag:'攻击后',txt:'已<b>切断它的联网权限</b>，录音行为已停止。'}
+      ]
+    },
+    {
+      id:'lock', ico:'🔒', name:'智能门锁',
+      attack:'有人在暴力破解密码',
+      say:'有人在你的智能门锁上连续试了十二次密码，全都是错的。我已经锁定它了。',
+      bubble:'有人连续试了 <em>12 次门锁密码</em>，全错。我已经把它锁定了。',
+      logs:[
+        {t:1,tag:'攻击前',txt:'门锁开放了一个<b>不必要的远程管理端口</b>，我建议过关掉它。'},
+        {t:2,tag:'攻击中',txt:'2 分钟内出现<b>12 次连续密码错误</b>，这是典型的暴力破解特征。'},
+        {t:3,tag:'攻击后',txt:'已<b>锁定门锁 10 分钟</b>并记录了尝试来源，你的门是安全的。'}
+      ]
+    },
+    {
+      id:'router', ico:'📡', name:'家庭路由器',
+      attack:'DNS 设置被人偷偷改了',
+      say:'有人偷偷改了你家路由器的 DNS 设置，想把你引到假网站上。我已经改回来了。',
+      bubble:'有人改了路由器的 <em>DNS 设置</em>，想把你引到假网站。我已经改回来了。',
+      logs:[
+        {t:1,tag:'攻击前',txt:'路由器管理后台用的还是<b>admin / admin</b> 这种弱口令。'},
+        {t:2,tag:'攻击中',txt:'DNS 服务器被指向了一个<b>陌生的恶意地址</b>——这会让你访问的网站被掉包。'},
+        {t:3,tag:'攻击后',txt:'已<b>恢复原本的 DNS 配置</b>，并强制要求你下次登录时改密码。'}
+      ]
+    }
+  ];
+
+  const IDLE_LINES = [
+    '我在守着呢，一切正常 👀',
+    '四台设备都乖乖的，没事发生 ✨',
+    '安静得很，我继续盯着 🌙'
+  ];
+
+  let soundOn = true;
+  const state = {}; // id -> 'ok' | 'hacked'
+
+  const elDevices = document.getElementById('devices');
+  const elLog = document.getElementById('log');
+  const elBubble = document.getElementById('bubble');
+  const elDock = document.getElementById('dock');
+  const elCount = document.getElementById('deviceCount');
+  const elSoundBtn = document.getElementById('soundBtn');
+
+  /* ===== 语音：用浏览器自带的 TTS，手机上直接出声 ===== */
+  function speak(text){
+    if(!soundOn) return;
+    if(!('speechSynthesis' in window)) return;
+    try{
+      speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = 'zh-CN';
+      u.rate = 1.0;
+      u.pitch = 1.2;              // 音调调高一点，更像个小家伙
+      const voices = speechSynthesis.getVoices() || [];
+      const zh = voices.find(v => v.lang && v.lang.toLowerCase().indexOf('zh') === 0);
+      if(zh) u.voice = zh;
+      u.onstart = () => elDock.classList.add('talking');
+      u.onend   = () => elDock.classList.remove('talking');
+      speechSynthesis.speak(u);
+      // 兜底：万一 onstart/onend 没触发，也让声波动一会儿
+      elDock.classList.add('talking');
+      setTimeout(()=>elDock.classList.remove('talking'), Math.max(2500, text.length*160));
+    }catch(e){ /* 不支持就安静地跳过，不影响其他功能 */ }
+  }
+
+  /* ===== 渲染设备卡片 ===== */
+  function renderDevices(){
+    elDevices.innerHTML = '';
+    DEVICES.forEach(d=>{
+      const st = state[d.id] || 'ok';
+      const card = document.createElement('div');
+      card.className = 'device' + (st==='hacked' ? ' hacked' : '');
+      card.innerHTML = `
+        <span class="ico">${d.ico}</span>
+        <div class="name">${d.name}</div>
+        <div class="state"><span class="led"></span>${st==='hacked' ? d.attack : '正常运行'}</div>
+        <div class="hint">${st==='hacked' ? '再点一下 → 让 Ditto 处理' : '点一下 → 模拟被入侵'}</div>
+        <div class="seal">ISOLATED · 已隔离</div>
+      `;
+      card.addEventListener('click', ()=>onTap(d));
+      elDevices.appendChild(card);
+    });
+    updateCount();
+  }
+
+  function updateCount(){
+    const bad = DEVICES.filter(d=>state[d.id]==='hacked').length;
+    const iso = DEVICES.filter(d=>state[d.id]==='isolated').length;
+    if(bad>0){ elCount.textContent = `⚠️ ${bad} 台设备异常`; elCount.style.color='#E85A6B'; }
+    else if(iso>0){ elCount.textContent = `${iso} 台已隔离`; elCount.style.color='#7C5CBF'; }
+    else { elCount.textContent = '4 台设备在线'; elCount.style.color=''; }
+  }
+
+  /* ===== 点击逻辑 ===== */
+  function onTap(d){
+    const st = state[d.id] || 'ok';
+
+    if(st === 'ok'){
+      // 第一下：模拟被入侵
+      state[d.id] = 'hacked';
+      renderDevices();
+      setBubble(`⚠️ 咦？<em>${d.name}</em> 好像不太对劲……`, false);
+      speak(`咦，${d.name}好像不太对劲。`);
+      return;
+    }
+
+    if(st === 'hacked'){
+      // 第二下：Ditto 出手处理
+      state[d.id] = 'isolated';
+      renderDevices();
+      // 隔离状态的卡片要单独加 class（renderDevices 只处理了 hacked）
+      applyIsolated();
+      setBubble(d.bubble, true);
+      speak(d.say);
+      addLogs(d);
+      return;
+    }
+
+    // 已隔离：点一下恢复
+    state[d.id] = 'ok';
+    renderDevices();
+    applyIsolated();
+    setBubble(`<em>${d.name}</em> 已经恢复正常了，我继续盯着 👀`, false);
+    speak(`${d.name}已经恢复正常了。`);
+  }
+
+  function applyIsolated(){
+    Array.from(elDevices.children).forEach((card,i)=>{
+      const d = DEVICES[i];
+      if(state[d.id]==='isolated'){
+        card.classList.remove('hacked');
+        card.classList.add('isolated');
+        const hint = card.querySelector('.hint');
+        const stt  = card.querySelector('.state');
+        if(stt) stt.innerHTML = '<span class="led"></span>已被 Ditto 隔离';
+        if(hint) hint.textContent = '点一下 → 恢复正常';
+      }
+    });
+    updateCount();
+  }
+
+  function setBubble(html, isAlert){
+    elBubble.innerHTML = html;
+    elBubble.classList.toggle('idle', !isAlert);
+    elBubble.classList.remove('pop');
+    void elBubble.offsetWidth;   // 强制重绘，让动画能重复播放
+    elBubble.classList.add('pop');
+  }
+
+  /* ===== 防御日志：三道防线各出一条 ===== */
+  function addLogs(d){
+    if(elLog.querySelector('.log-empty')) elLog.innerHTML = '';
+    d.logs.forEach((l,i)=>{
+      setTimeout(()=>{
+        const item = document.createElement('div');
+        item.className = 'log-item t'+l.t;
+        item.innerHTML = `<span class="tag">${l.tag}</span><span class="txt">${d.ico} <b>${d.name}</b>：${l.txt}</span>`;
+        elLog.insertBefore(item, elLog.firstChild);
+      }, i*380);
+    });
+  }
+
+  /* ===== 声音开关 ===== */
+  elSoundBtn.addEventListener('click', ()=>{
+    soundOn = !soundOn;
+    elSoundBtn.textContent = soundOn ? '🔊 语音已开启' : '🔇 语音已关闭';
+    elSoundBtn.classList.toggle('off', !soundOn);
+    if(!soundOn && 'speechSynthesis' in window){ try{speechSynthesis.cancel();}catch(e){} }
+    else speak('语音打开了。');
+  });
+
+  /* ===== 全部重置 ===== */
+  document.getElementById('resetBtn').addEventListener('click', ()=>{
+    DEVICES.forEach(d=> state[d.id]='ok');
+    renderDevices();
+    elLog.innerHTML = '<div class="log-empty">还没有异常。<br>点上面任意一台设备试试看。</div>';
+    setBubble(IDLE_LINES[Math.floor(Math.random()*IDLE_LINES.length)], false);
+    if('speechSynthesis' in window){ try{speechSynthesis.cancel();}catch(e){} }
+  });
+
+  /* ===== 眨眼 ===== */
+  (function blink(){
+    const eyes = document.getElementById('dittoEyes');
+    if(!eyes) return;
+    setTimeout(()=>{
+      eyes.style.transition='transform .09s';
+      eyes.style.transformOrigin='center 96px';
+      eyes.style.transform='scaleY(.08)';
+      setTimeout(()=>{ eyes.style.transform='none'; blink(); }, 100);
+    }, 1800 + Math.random()*3200);
+  })();
+
+  // 某些浏览器要等 voices 加载完才有中文声音
+  if('speechSynthesis' in window){
+    speechSynthesis.onvoiceschanged = function(){ /* 触发一次加载即可 */ };
+  }
+
+  renderDevices();
+})();
+</script>
+</body>
+</html>

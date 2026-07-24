@@ -337,6 +337,41 @@ html.js-anim-ready .reveal{opacity:0;transform:translateY(46px)}
 .teaser-card p{font-size:14px;line-height:1.8;color:var(--gray);margin-bottom:16px}
 .teaser-more{font-size:13px;font-weight:700;color:var(--warm)}
 
+/* ---------- 扫码试玩 ---------- */
+.try-section{padding:40px 5vw 120px}
+.try-card{
+  background:linear-gradient(150deg,var(--purple-900),#4a3577);
+  border-radius:var(--radius);padding:70px 6vw;
+  display:grid;grid-template-columns:1.15fr .85fr;gap:60px;align-items:center;
+  position:relative;overflow:hidden;
+}
+.try-card::after{
+  content:"";position:absolute;width:340px;height:340px;border-radius:50%;
+  background:rgba(179,157,219,.18);top:-140px;right:-90px;pointer-events:none;
+}
+.try-card .section-label{color:var(--purple-300)}
+.try-card h2{color:#fff;position:relative;z-index:1}
+.try-desc{
+  color:var(--lilac-2);font-size:15.5px;line-height:1.9;
+  max-width:420px;margin:22px 0 32px;position:relative;z-index:1;
+}
+.try-btn{position:relative;z-index:1}
+.try-right{display:flex;flex-direction:column;align-items:center;gap:16px;position:relative;z-index:1}
+.qr-frame{
+  background:#fff;padding:18px;border-radius:24px;
+  box-shadow:0 26px 54px -22px rgba(0,0,0,.5);
+  transform:rotate(-2deg);
+  display:grid;place-items:center;
+  min-width:226px;min-height:226px;
+}
+.qr-box{display:grid;place-items:center}
+.qr-box img,.qr-box canvas{display:block}
+.qr-fallback{
+  font-size:12.5px;color:var(--gray);text-align:center;line-height:1.7;padding:20px;
+}
+.qr-fallback span{color:var(--purple-300);font-size:11.5px}
+.qr-cap{color:var(--purple-300);font-size:13px;font-weight:700}
+
 /* ---------- CTA ---------- */
 .cta{text-align:center;padding:150px 5vw 130px;position:relative;overflow:hidden}
 .cta h2{margin:0 auto 18px;max-width:900px}
@@ -396,6 +431,10 @@ footer{
   .evidence-photo{top:-16px;left:calc(50% - 60px)}
   .form-card{padding:30px}
   .form-row{grid-template-columns:1fr}
+  .try-card{grid-template-columns:1fr;gap:40px;padding:56px 8vw;text-align:center}
+  .try-card .section-label{justify-content:center}
+  .try-desc{margin-left:auto;margin-right:auto}
+  .try-section{padding:20px 4vw 80px}
   .page-hero{padding:150px 6vw 60px;align-items:flex-start}
 }
 @media(prefers-reduced-motion:reduce){

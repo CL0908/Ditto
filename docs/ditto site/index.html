@@ -110,6 +110,27 @@
   </div>
 </section>
 
+<!-- ================= 扫码试玩 ================= -->
+<section class="try-section">
+  <div class="try-card">
+    <div class="try-left">
+      <div class="section-label">Try It</div>
+      <h2 class="reveal wavy">扫一下，<br>自己玩玩看</h2>
+      <p class="try-desc reveal">点一台设备，假装它被黑了——看 Ditto 怎么发现、怎么处理，还会真的开口跟你说话。手机记得开着声音。</p>
+      <a class="btn warm magnetic try-btn reveal" href="play.html">直接在这台设备上试玩 →</a>
+    </div>
+    <div class="try-right reveal">
+      <div class="qr-frame">
+        <div id="qrcode" class="qr-box"></div>
+        <div class="qr-fallback" id="qrFallback">
+          二维码加载中…<br><span>没显示的话，直接点左边的按钮</span>
+        </div>
+      </div>
+      <div class="qr-cap">📱 用手机相机扫一下</div>
+    </div>
+  </div>
+</section>
+
 <!-- ================= CTA ================= -->
 <section class="cta" id="cta">
   <div class="ditto-cameo" style="top:8px;left:calc(50% - 220px);width:70px;transform:rotate(-6deg)" aria-hidden="true">
@@ -131,6 +152,43 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="assets/app.js"></script>
+<script>
+/* ============================================================
+   二维码：默认自动指向当前网址下的 play.html，
+   所以你部署到哪里，它就自动生成对应的链接，不用手动改。
+
+   ⚠️ 只有一种情况需要手动改：做易拉宝/海报要提前印二维码时，
+   把下面这行的 null 换成最终网址，例如：
+   const DEMO_URL = 'https://cl0908.github.io/Ditto/play.html';
+   ============================================================ */
+const DEMO_URL = null;
+
+(function(){
+  const box = document.getElementById('qrcode');
+  const fallback = document.getElementById('qrFallback');
+  if(!box) return;
+
+  const url = DEMO_URL || new URL('play.html', window.location.href).href;
+
+  if(typeof QRCode === 'undefined'){
+    // CDN 没加载出来——不留白，给一句人能看懂的提示
+    if(fallback) fallback.innerHTML = '二维码没加载出来<br><span>直接点左边按钮试玩</span>';
+    return;
+  }
+  try{
+    new QRCode(box, {
+      text: url,
+      width: 190, height: 190,
+      colorDark: '#3D2B63', colorLight: '#ffffff',
+      correctLevel: QRCode.CorrectLevel.M
+    });
+    if(fallback) fallback.style.display = 'none';
+  }catch(e){
+    if(fallback) fallback.innerHTML = '二维码生成失败<br><span>直接点左边按钮试玩</span>';
+  }
+})();
+</script>
 </body>
 </html>
