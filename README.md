@@ -10,7 +10,7 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-  <img src="img/logo.png" alt="Logo" width="88" height="88">
+  <img src="img/logo.jpeg" alt="Logo" width="88" height="88">
 
   <h1 align="center">Ditto · Sentinel</h1>
 
