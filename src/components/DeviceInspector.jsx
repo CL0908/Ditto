@@ -89,7 +89,7 @@ export default function DeviceInspector() {
                 <span className="k">可信端点</span>
                 <span className="v">2</span>
                 <span className="k">当前通信目标</span>
-                <span className="v" style={{ color: warning ? '#d94055' : undefined }}>
+                <span className="v" style={{ color: warning ? '#d64a5b' : undefined }}>
                   {warning ? '7 个外部地址' : '2'}
                 </span>
               </div>

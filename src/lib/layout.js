@@ -18,7 +18,7 @@ export const LAYOUT = {
 export const VIEWS = {
   overview: { pos: [7.4, 5.3, 8.9], tgt: [0, 1.3, -0.6] },
   camera_01: { pos: [-1.6, 2.4, -1.4], tgt: [-1.6, 3.5, -4.35] },
-  guardian: { pos: [3.4, 2.8, 1.6], tgt: [1.8, 2.0, -1.9] },
+  guardian: { pos: [4.4, 3.4, 3.4], tgt: [0.5, 2.0, -1.6] }, // wide — frames Tito's patrol zone
   light_01: { pos: [1.7, 1.7, 2.4], tgt: [1.7, 2.9, -0.25] },
   plug_01: { pos: [3.2, 1.5, -2.2], tgt: [3.6, 0.6, -4.6] },
 }

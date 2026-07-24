@@ -28,7 +28,7 @@ function EnergyPulses({ from, to, count = 3 }) {
       {Array.from({ length: count }).map((_, i) => (
         <mesh key={i} ref={(el) => (refs.current[i] = el)}>
           <sphereGeometry args={[0.022, 8, 8]} />
-          <meshBasicMaterial color="#8b5cf6" />
+          <meshBasicMaterial color="#7C5CBF" />
         </mesh>
       ))}
     </group>
@@ -90,7 +90,7 @@ export default function SmartPlug() {
       {/* LED ring */}
       <mesh ref={ring} position={[x, y, z + 0.098]}>
         <torusGeometry args={[0.032, 0.007, 10, 26]} />
-        <meshStandardMaterial color="#e8e2f6" emissive="#8b5cf6" emissiveIntensity={1.4} roughness={0.3} />
+        <meshStandardMaterial color="#e8e2f6" emissive="#7C5CBF" emissiveIntensity={1.4} roughness={0.3} />
       </mesh>
 
       {/* power cable into TV console + flow */}

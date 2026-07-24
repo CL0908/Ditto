@@ -84,29 +84,37 @@ function CloudNode() {
   )
 }
 
-/* Hostile endpoint that materialises outside the home during the attack */
+/* Hostile endpoint that materialises outside the home during the attack —
+   soft pastel-styled "unknown sender" orb: warm-red core + radar ring + gentle glow */
 function IntruderNode() {
   const core = useRef()
+  const ring = useRef()
   useFrame(({ clock }) => {
     const t = clock.elapsedTime
     if (core.current) {
-      core.current.rotation.y = t * 1.4
-      core.current.rotation.x = t * 0.7
-      const s = 1 + Math.abs(Math.sin(t * 4)) * 0.15
+      const s = 1 + Math.abs(Math.sin(t * 4)) * 0.12
       core.current.scale.setScalar(s)
+    }
+    if (ring.current) {
+      ring.current.rotation.z = t * 1.2
+      ring.current.rotation.x = Math.PI / 2.4 + Math.sin(t * 0.9) * 0.25
     }
   })
   return (
     <group position={LAYOUT.intruder.pos}>
       <mesh ref={core}>
-        <icosahedronGeometry args={[0.3, 0]} />
-        <meshStandardMaterial color="#5a2430" emissive="#ff3355" emissiveIntensity={1.3} roughness={0.35} wireframe />
+        <sphereGeometry args={[0.22, 24, 24]} />
+        <meshStandardMaterial color="#f7cdd3" emissive="#E85A6B" emissiveIntensity={1.1} roughness={0.35} />
+      </mesh>
+      <mesh ref={ring}>
+        <torusGeometry args={[0.38, 0.018, 12, 40]} />
+        <meshBasicMaterial color="#E85A6B" transparent opacity={0.65} />
       </mesh>
       <mesh>
         <sphereGeometry args={[0.46, 18, 18]} />
-        <meshBasicMaterial color="#ff3344" transparent opacity={0.1} depthWrite={false} blending={THREE.AdditiveBlending} />
+        <meshBasicMaterial color="#E85A6B" transparent opacity={0.1} depthWrite={false} blending={THREE.AdditiveBlending} />
       </mesh>
-      <Sparkles count={30} scale={[1.4, 1.4, 1.4]} size={3} speed={2.2} color="#ff6a3d" opacity={0.9} />
+      <Sparkles count={16} scale={[1.2, 1.2, 1.2]} size={2.5} speed={1.6} color="#E85A6B" opacity={0.7} />
       <Html position={[0, 0.72, 0]} center zIndexRange={[25, 0]}>
         <div className="net-chip">未知目标 · 185.220.▮.▮</div>
       </Html>
@@ -160,8 +168,8 @@ export default function NetworkGraph() {
       {attack && !camOff && (
         <>
           <IntruderNode />
-          <Line points={camIntruder} color="#ff3344" transparent opacity={0.85} lineWidth={1.6} />
-          <Flow from={camTop} to={intruder} lift={1.6} color="#ff5544" count={16} speed={0.55} jitter={0.16} size={0.045} />
+          <Line points={camIntruder} color="#E85A6B" transparent opacity={0.8} lineWidth={1.6} />
+          <Flow from={camTop} to={intruder} lift={1.6} color="#E85A6B" count={16} speed={0.55} jitter={0.16} size={0.045} />
 
           <Html position={midRed} center zIndexRange={[25, 0]}>
             <div className="net-chip">流量激增 +{network.spike}%</div>

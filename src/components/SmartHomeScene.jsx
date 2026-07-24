@@ -132,6 +132,17 @@ function Room() {
   )
 }
 
+/* scales children about a floor anchor point — walls stay put, growth goes into the room */
+function ScaleAbout({ anchor, s, children }) {
+  return (
+    <group position={anchor}>
+      <group scale={s}>
+        <group position={[-anchor[0], -anchor[1], -anchor[2]]}>{children}</group>
+      </group>
+    </group>
+  )
+}
+
 /* TV on the back wall with a low console bench, speaker and plants */
 function TVUnit() {
   const screen = useRef()
@@ -141,7 +152,7 @@ function TVUnit() {
     }
   })
   return (
-    <group>
+    <ScaleAbout anchor={[1.8, 0, -4.7]} s={1.2}>
       {/* console bench */}
       <RoundedBox args={[2.6, 0.42, 0.48]} radius={0.03} position={[1.8, 0.27, -4.42]}>
         <meshStandardMaterial color="#e3dcf1" roughness={0.55} metalness={0.15} />
@@ -179,7 +190,7 @@ function TVUnit() {
           </mesh>
         </group>
       ))}
-    </group>
+    </ScaleAbout>
   )
 }
 
@@ -299,7 +310,7 @@ function BackWindowBlinds() {
 /* Workstation corner: desk + monitor + lamp + chair against the left wall */
 function DeskCorner() {
   return (
-    <group>
+    <ScaleAbout anchor={[-5.2, 0, -1.2]} s={1.15}>
       {/* desktop */}
       <RoundedBox args={[0.75, 0.06, 2.0]} radius={0.015} position={[-4.82, 0.98, -1.2]}>
         <meshStandardMaterial color="#f5f2fb" roughness={0.4} metalness={0.1} />
@@ -318,7 +329,7 @@ function DeskCorner() {
         </RoundedBox>
         <mesh position={[0.025, 0, 0]} rotation={[0, Math.PI / 2, 0]}>
           <planeGeometry args={[0.62, 0.36]} />
-          <meshStandardMaterial color="#241f3a" emissive="#8b5cf6" emissiveIntensity={0.6} roughness={0.4} />
+          <meshStandardMaterial color="#241f3a" emissive="#7C5CBF" emissiveIntensity={0.6} roughness={0.4} />
         </mesh>
       </group>
       <mesh position={[-4.62, 1.11, -1.35]}>
@@ -366,7 +377,7 @@ function DeskCorner() {
           <meshStandardMaterial color="#8d84a8" roughness={0.5} metalness={0.4} />
         </mesh>
       </group>
-    </group>
+    </ScaleAbout>
   )
 }
 
@@ -376,7 +387,7 @@ const BOOK_COLORS = ['#b8a9e8', '#e8a9b8', '#a9c8e8', '#a9e8c3', '#e8d8a9', '#d0
 function Bookshelf() {
   const frame = '#ded6ee'
   return (
-    <group position={[-4.95, 0, -3.2]}>
+    <group position={[-4.93, 0, -3.35]} scale={1.15}>
       {/* side panels */}
       {[-0.975, 0.975].map((z) => (
         <mesh key={z} position={[0, 0.96, z]}>
@@ -429,7 +440,7 @@ function Bookshelf() {
 /* Cylindrical air purifier beside the sofa */
 function AirPurifier() {
   return (
-    <group position={[0.25, 0, 1.3]}>
+    <group position={[-0.25, 0, 1.45]} scale={1.15}>
       <mesh position={[0, 0.33, 0]}>
         <cylinderGeometry args={[0.2, 0.22, 0.62, 20]} />
         <meshStandardMaterial color="#f4f6fb" roughness={0.5} metalness={0.1} />
@@ -440,7 +451,7 @@ function AirPurifier() {
       </mesh>
       <mesh position={[0, 0.45, 0.21]}>
         <sphereGeometry args={[0.022, 8, 8]} />
-        <meshBasicMaterial color="#22b47e" toneMapped={false} />
+        <meshBasicMaterial color="#4C9A7D" toneMapped={false} />
       </mesh>
     </group>
   )
@@ -449,7 +460,7 @@ function AirPurifier() {
 /* Soft round pouf on the rug corner */
 function Pouf() {
   return (
-    <group position={[0.5, 0, -0.2]}>
+    <group position={[0.5, 0, -0.2]} scale={1.2}>
       <mesh position={[0, 0.16, 0]}>
         <cylinderGeometry args={[0.34, 0.36, 0.3, 20]} />
         <meshStandardMaterial color="#c9bce6" roughness={0.95} />
@@ -466,7 +477,7 @@ function Sofa() {
   const fabric = '#cfc5e8'
   const cushion = '#bfb2e0'
   return (
-    <group position={[1.8, 0, 1.3]}>
+    <group position={[1.8, 0, 1.3]} scale={1.25}>
       <RoundedBox args={[2.4, 0.34, 1.0]} radius={0.08} position={[0, 0.3, 0]}>
         <meshStandardMaterial color={fabric} roughness={0.9} />
       </RoundedBox>
@@ -489,7 +500,7 @@ function Sofa() {
 
 function CoffeeTable() {
   return (
-    <group position={[1.7, 0, -0.25]}>
+    <group position={[1.7, 0, -0.25]} scale={1.2}>
       <RoundedBox args={[1.05, 0.05, 0.6]} radius={0.015} position={[0, 0.4, 0]}>
         <meshStandardMaterial color="#f5f2fb" roughness={0.3} metalness={0.2} />
       </RoundedBox>
@@ -506,7 +517,7 @@ function CoffeeTable() {
       ))}
       {/* book + tiny succulent */}
       <RoundedBox args={[0.28, 0.045, 0.2]} radius={0.01} position={[-0.18, 0.45, -0.08]} rotation={[0, 0.35, 0]}>
-        <meshStandardMaterial color="#8b5cf6" roughness={0.7} />
+        <meshStandardMaterial color="#7C5CBF" roughness={0.7} />
       </RoundedBox>
       <group position={[0.25, 0.425, 0.1]}>
         <mesh position={[0, 0.04, 0]}>
@@ -518,6 +529,112 @@ function CoffeeTable() {
           <meshStandardMaterial color="#8fce9f" roughness={0.9} />
         </mesh>
       </group>
+    </group>
+  )
+}
+
+/* Dining corner — round table + 4 chairs + centerpiece plant, same pastel palette */
+function DiningSet() {
+  const chairAt = (x, z, ry) => (
+    <group key={`${x},${z}`} position={[x, 0, z]} rotation={[0, ry, 0]}>
+      <RoundedBox args={[0.42, 0.06, 0.42]} radius={0.02} position={[0, 0.46, 0]}>
+        <meshStandardMaterial color="#cfc5e8" roughness={0.9} />
+      </RoundedBox>
+      <RoundedBox args={[0.42, 0.5, 0.06]} radius={0.02} position={[0, 0.72, 0.21]}>
+        <meshStandardMaterial color="#bfb2e0" roughness={0.9} />
+      </RoundedBox>
+      {[[-0.17, -0.17], [0.17, -0.17], [-0.17, 0.17], [0.17, 0.17]].map(([lx, lz], i) => (
+        <mesh key={i} position={[lx, 0.22, lz]}>
+          <cylinderGeometry args={[0.018, 0.018, 0.44, 8]} />
+          <meshStandardMaterial color="#b3a8d4" roughness={0.5} metalness={0.3} />
+        </mesh>
+      ))}
+    </group>
+  )
+  return (
+    <group position={[-2.4, 0, 2.9]} rotation={[0, 0.35, 0]}>
+      {/* round pedestal table */}
+      <mesh position={[0, 0.73, 0]}>
+        <cylinderGeometry args={[0.62, 0.62, 0.045, 28]} />
+        <meshStandardMaterial color="#f5f2fb" roughness={0.3} metalness={0.2} />
+      </mesh>
+      <mesh position={[0, 0.37, 0]}>
+        <cylinderGeometry args={[0.05, 0.07, 0.7, 12]} />
+        <meshStandardMaterial color="#b3a8d4" roughness={0.5} metalness={0.3} />
+      </mesh>
+      <mesh position={[0, 0.02, 0]}>
+        <cylinderGeometry args={[0.3, 0.32, 0.04, 20]} />
+        <meshStandardMaterial color="#b3a8d4" roughness={0.5} metalness={0.3} />
+      </mesh>
+      {/* centerpiece plant */}
+      <group position={[0, 0.755, 0]}>
+        <mesh position={[0, 0.045, 0]}>
+          <cylinderGeometry args={[0.055, 0.07, 0.09, 12]} />
+          <meshStandardMaterial color="#f0ebf8" roughness={0.8} />
+        </mesh>
+        <mesh position={[0, 0.16, 0]}>
+          <icosahedronGeometry args={[0.09, 1]} />
+          <meshStandardMaterial color="#8fce9f" roughness={0.9} />
+        </mesh>
+      </group>
+      {/* 4 chairs facing the table */}
+      {chairAt(-0.95, 0, -Math.PI / 2)}
+      {chairAt(0.95, 0, Math.PI / 2)}
+      {chairAt(0, -0.95, Math.PI)}
+      {chairAt(0, 0.95, 0)}
+    </group>
+  )
+}
+
+/* Tall potted plant — floor greenery for empty corners */
+function FloorPlant({ pos, s = 1 }) {
+  return (
+    <group position={pos} scale={s}>
+      <mesh position={[0, 0.14, 0]}>
+        <cylinderGeometry args={[0.16, 0.2, 0.28, 16]} />
+        <meshStandardMaterial color="#f0ebf8" roughness={0.8} />
+      </mesh>
+      <mesh position={[0, 0.28, 0]}>
+        <cylinderGeometry args={[0.17, 0.17, 0.03, 16]} />
+        <meshStandardMaterial color="#e3dcf1" roughness={0.8} />
+      </mesh>
+      {/* stems */}
+      {[[0, 0], [0.07, 0.05], [-0.06, 0.06]].map(([sx, sz], i) => (
+        <mesh key={i} position={[sx / 2, 0.55, sz / 2]} rotation={[sz * 1.2, 0, -sx * 1.2]}>
+          <cylinderGeometry args={[0.012, 0.018, 0.6, 8]} />
+          <meshStandardMaterial color="#7ba889" roughness={0.9} />
+        </mesh>
+      ))}
+      {/* foliage clusters */}
+      {[[0, 0.95, 0, 0.24], [0.16, 0.78, 0.1, 0.17], [-0.14, 0.82, -0.08, 0.18], [0.02, 0.72, 0.16, 0.15]].map(([fx, fy, fz, fr], i) => (
+        <mesh key={i} position={[fx, fy, fz]}>
+          <icosahedronGeometry args={[fr, 1]} />
+          <meshStandardMaterial color={i % 2 ? '#8fce9f' : '#7bc090'} roughness={0.9} />
+        </mesh>
+      ))}
+    </group>
+  )
+}
+
+/* Round side table beside the sofa with a little book */
+function SideTable() {
+  return (
+    <group position={[3.75, 0, 1.45]}>
+      <mesh position={[0, 0.52, 0]}>
+        <cylinderGeometry args={[0.26, 0.26, 0.035, 24]} />
+        <meshStandardMaterial color="#f5f2fb" roughness={0.3} metalness={0.2} />
+      </mesh>
+      <mesh position={[0, 0.26, 0]}>
+        <cylinderGeometry args={[0.03, 0.04, 0.5, 10]} />
+        <meshStandardMaterial color="#b3a8d4" roughness={0.5} metalness={0.3} />
+      </mesh>
+      <mesh position={[0, 0.015, 0]}>
+        <cylinderGeometry args={[0.16, 0.18, 0.03, 16]} />
+        <meshStandardMaterial color="#b3a8d4" roughness={0.5} metalness={0.3} />
+      </mesh>
+      <RoundedBox args={[0.22, 0.04, 0.16]} radius={0.008} position={[0.03, 0.56, 0]} rotation={[0, -0.4, 0]}>
+        <meshStandardMaterial color="#e8a9b8" roughness={0.7} />
+      </RoundedBox>
     </group>
   )
 }
@@ -550,6 +667,10 @@ export default function SmartHomeScene() {
         <CoffeeTable />
         <AirPurifier />
         <Pouf />
+        <DiningSet />
+        <SideTable />
+        <FloorPlant pos={[4.72, 0, -4.05]} s={1.25} />
+        <FloorPlant pos={[-4.75, 0, 4.25]} s={1.0} />
 
         <CameraDevice />
         <ZigbeeLight />
