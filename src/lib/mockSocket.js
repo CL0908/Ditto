@@ -65,7 +65,7 @@ const BOOT_SCRIPT = [
   { at: 1200, msg: { type: 'guardian', state: 'idle', message: 'Tito 守护者已上线，行为基线加载完成，正在监控 3 台设备。', speak: false } },
 ]
 
-function startMockBackend(onMessage) {
+export function startMockBackend(onMessage) {
   let timers = []
   let attacking = false
 

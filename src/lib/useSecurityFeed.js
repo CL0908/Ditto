@@ -1,7 +1,12 @@
 import { useEffect } from 'react'
 import { useSecurityStore } from '../state/store.js'
 import { connectSecurityFeed } from './mockSocket.js'
+import { connectSupabaseFeed } from './supabaseSocket.js'
+import { hasSupabase } from './supabaseClient.js'
 import { speak } from './speech.js'
+
+// 配了 Supabase 就走实时后端,否则用 mock/WS
+const connectFeed = hasSupabase ? connectSupabaseFeed : connectSecurityFeed
 
 let activeConnection = null
 
@@ -23,7 +28,7 @@ export function useSecurityFeed() {
       }
     }
 
-    const conn = connectSecurityFeed({ onMessage })
+    const conn = connectFeed({ onMessage })
     activeConnection = conn
     return () => {
       conn.close()
