@@ -29,7 +29,8 @@
 
   <p align="center">
     <sub>Built at AdventureX 2026 · Hangzhou</sub><br />
-    <sub>产品网页运行 DEMO ：https://cl0908.github.io/Ditto/</sub>
+    <sub>产品网页运行 DEMO ：https://cl0908.github.io/Ditto/</sub><br />
+    <sub>产品试玩 DEMO ：https://cl0908.github.io/Ditto/play.html</sub>
   </p>
 </div>
 
