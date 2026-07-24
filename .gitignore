@@ -7,3 +7,7 @@ __pycache__/
 .venv/
 .DS_Store
 node_modules/
+
+node_modules/
+dist/
+screenshot_*.png

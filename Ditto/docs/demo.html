@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>预约演示 · Ditto Sentinel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Unbounded:wght@500;700;900&family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="index.html"><span class="logo-dot"></span>DITTO</a>
+  <div class="nav-links">
+    <a href="why.html">为什么</a>
+    <a href="defense.html">三道防线</a>
+    <a href="speak.html">它会说话</a>
+    <a href="tito/">主页</a>
+    <a class="btn" href="demo.html">预约演示</a>
+  </div>
+</nav>
+
+<!-- ================= PAGE HERO ================= -->
+<header class="page-hero" style="min-height:38vh">
+  <div class="hero-bg-blob blob-a"></div>
+  <div class="hero-bg-blob blob-b"></div>
+  <a class="back-pill" href="index.html">← 返回主页</a>
+  <div class="eyebrow">Book a Demo</div>
+  <h1 class="reveal">预约一场 10 分钟演示</h1>
+  <p class="hero-sub reveal">留下联系方式，我们会安排一次现场或线上演示，让你亲眼看看 Ditto 怎么工作。</p>
+</header>
+
+<!-- ================= FORM ================= -->
+<section style="padding-top:20px">
+  <div class="form-wrap">
+    <div class="form-side reveal">
+      <div class="ditto-wrap small" aria-hidden="true">
+        <svg viewBox="0 0 240 220" xmlns="http://www.w3.org/2000/svg">
+          <path fill="#FDFBFF" stroke="#E4DAF5" stroke-width="3" d="M120 22 C74 22 44 58 44 104 C44 138 40 158 46 176 C50 188 62 190 70 180 C76 173 84 173 90 181 C96 189 108 189 114 181 C118 176 124 176 128 181 C134 189 146 189 152 181 C158 173 166 173 172 180 C180 190 192 188 196 176 C202 158 196 138 196 104 C196 58 166 22 120 22 Z"/>
+          <circle cx="95" cy="96" r="9" fill="#261C40"/><circle cx="145" cy="96" r="9" fill="#261C40"/><circle cx="148.5" cy="92.5" r="3" fill="#fff"/>
+        </svg>
+      </div>
+      <h2>演示会看到什么？</h2>
+      <p>大概 10 分钟，线上或线下都可以。我们会用真实设备现场演示一次入侵与响应的全过程。</p>
+      <div class="form-perk">
+        <div class="ico">🎯</div>
+        <div><strong>真实攻防演示</strong><span>现场模拟一次设备入侵，看 Ditto 如何在几秒内察觉并响应</span></div>
+      </div>
+      <div class="form-perk">
+        <div class="ico">🗣️</div>
+        <div><strong>听它开口说话</strong><span>不是弹窗、不是日志，是 Ditto 用人话直接告诉你发生了什么</span></div>
+      </div>
+      <div class="form-perk">
+        <div class="ico">💬</div>
+        <div><strong>一对一答疑</strong><span>关于技术架构、部署方式、定价，当场都可以问</span></div>
+      </div>
+    </div>
+
+    <div class="form-card reveal">
+      <form id="demoForm">
+        <div class="form-row">
+          <div class="field">
+            <label for="name">姓名 *</label>
+            <input id="name" name="name" type="text" placeholder="怎么称呼你" required>
+          </div>
+          <div class="field">
+            <label for="company">公司 / 团队</label>
+            <input id="company" name="company" type="text" placeholder="选填">
+          </div>
+        </div>
+        <div class="field">
+          <label for="email">邮箱 *</label>
+          <input id="email" name="email" type="email" placeholder="用于发送演示邀请" required>
+        </div>
+        <div class="form-row">
+          <div class="field">
+            <label for="time">方便的时间</label>
+            <select id="time" name="time">
+              <option value="">不限，你们安排就好</option>
+              <option value="工作日上午">工作日上午</option>
+              <option value="工作日下午">工作日下午</option>
+              <option value="周末">周末</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="format">演示形式</label>
+            <select id="format" name="format">
+              <option value="线上">线上</option>
+              <option value="线下">线下（现场）</option>
+              <option value="都可以">都可以</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label for="msg">留言（选填）</label>
+          <textarea id="msg" name="msg" placeholder="想重点了解哪部分？比如技术架构、定价、落地案例……"></textarea>
+        </div>
+        <button type="submit" class="btn warm form-submit magnetic">预约演示</button>
+        <div class="form-note">提交后我们会尽快通过邮箱联系你确认时间</div>
+      </form>
+
+      <div class="form-success" id="formSuccess">
+        <div class="big-check">🎉</div>
+        <h3>收到啦！</h3>
+        <p>Ditto 已经记下了你的预约，我们会尽快通过邮箱联系你确认具体时间。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span>© 2026 Ditto Sentinel · 守护每一个连接</span>
+  <span>DITTO · AI-Powered IoT Security</span>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
