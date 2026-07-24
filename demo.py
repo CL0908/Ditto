@@ -12,6 +12,11 @@ import sys
 from pathlib import Path
 
 from alert_chain import AlertChain, anchor_to_chain
+import mindreset_quote as quote
+
+
+def _severity(score):
+    return "high" if score >= 0.9 else "medium" if score >= 0.7 else "low"
 
 BLOCKSCOUT_TX_URL = "https://testnet.blockscout.injective.network/tx/{tx_hash}"
 INJSCAN_HOME = "https://injscan.com"
@@ -35,6 +40,10 @@ def main():
     private_key = env["PRIVATE_KEY"]
     contract_address = env["CONTRACT_ADDRESS"]
 
+    # 告警输出屏（Quote/0）：未配置 DOT_* 时自动 MOCK（打印不真发）
+    quote.configure(env.get("DOT_API_KEY", ""), env.get("DOT_DEVICE_ID", ""),
+                    env.get("DASHBOARD_URL", ""))
+
     print("=" * 70)
     print("SENTINEL — Tamper-Evident Alert Anchoring Demo")
     print("=" * 70)
@@ -55,6 +64,16 @@ def main():
         flag = "ANOMALY" if anomaly_type != "normal" else "normal "
         print(f"  #{record['index']} [{flag}] {device_id:22s} {anomaly_type:20s} "
               f"score={score:.2f} hash={record['hash'][:16]}...")
+        # 异常 → 推到 Quote/0 电子墨水屏（脱敏摘要）
+        if anomaly_type != "normal":
+            quote.push_anomaly_alert(
+                device_name=device_id,
+                event_type=anomaly_type.replace("_", " "),
+                risk_score=int(score * 100),
+                severity=_severity(score),
+                incident_id=f"INC-{record['index']:04d}",
+                timestamp=str(record.get("timestamp", "")),
+            )
 
     is_valid, error = chain.verify()
     print(f"\n  Chain integrity check: {'OK' if is_valid else 'FAILED — ' + error}")
@@ -85,6 +104,9 @@ def main():
 
     status = "SUCCESS" if result["status"] == 1 else "FAILED"
     print(f"  Status:       {status}")
+    if result["status"] == 1:
+        # 哈希锚链成功 → Quote/0 显示存证完成
+        quote.push_evidence_sealed(f"chk-{result.get('checkpoint_index', 0)}")
     print(f"  Tx hash:      {result['tx_hash']}")
     if result["block_number"] is not None:
         print(f"  Block:        {result['block_number']}")

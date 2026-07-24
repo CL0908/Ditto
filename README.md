@@ -75,3 +75,28 @@ Copy `.env.example` to `.env` and replace placeholders before using the networke
 ## License
 
 MIT
+
+---
+
+## MindReset Quote/0 — Ambient Security Display (`mindreset_quote.py`)
+
+The sentinel's **physical alert output**. When an anomaly is detected and its hash
+anchored on-chain, a **sanitised** alert summary is pushed to a networked E-Ink
+screen (MindReset Quote/0) via the official REST API; NFC-tap opens the full
+incident dashboard.
+
+- **API**: `POST https://dot.mindreset.tech/api/authV2/open/device/{DEVICE_ID}/text`
+  (Bearer auth, 10 req/s). deviceId = uppercase 12-hex serial (e.g. `7CE8B17A3DF4`).
+- **Config**: `DOT_API_KEY` / `DOT_DEVICE_ID` / `DASHBOARD_URL` in `.env`
+  (unset → MOCK mode, prints instead of pushing — demo runs offline).
+- **Functions**: `push_normal_status` · `push_anomaly_alert` · `push_evidence_sealed` · `push_offline_status`.
+- **Safe by design**: API failures never block detection; retry + timeout + local
+  queue for transient errors; 4xx dropped (no retry); dedup identical content;
+  min-refresh guard (E-Ink is a status screen, not animation); **only sanitised
+  summaries are sent — never raw packets, camera content, full IPs, topology or identity.**
+- Wired into `demo.py`: each simulated anomaly renders on the screen; a successful
+  on-chain anchor shows `EVIDENCE SEALED`.
+
+> Role split — **T5 Core** = local AI security brain · **Zigbee/Wi-Fi collector** =
+> metadata layer · **DuckyClaw** = local agent/alert orchestration · **SentinelAnchor
+> (Injective)** = tamper-evident hash-chain · **Quote/0** = ambient security display.
