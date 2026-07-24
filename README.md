@@ -29,6 +29,7 @@
 
   <p align="center">
     <sub>Built at AdventureX 2026 · Hangzhou</sub>
+    <sub>https://cl0908.github.io/Ditto/</sub>
   </p>
 </div>
 
