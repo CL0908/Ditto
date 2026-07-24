@@ -40,6 +40,8 @@ DEVICE_ID = os.environ.get("DOT_DEVICE_ID", "")
 DASHBOARD_URL = os.environ.get("DASHBOARD_URL", "")
 MOCK = not (API_KEY and DEVICE_ID)
 
+USE_CANVAS = os.environ.get("QUOTE_CANVAS", "0") in ("1", "true", "True")  # 走 Canvas 富界面
+
 MIN_REFRESH_INTERVAL = 15.0   # 秒：E-Ink 状态屏，别高频刷
 TIMEOUT = 8.0
 MAX_RETRY = 2
@@ -74,7 +76,13 @@ def _canvas_url() -> str:
 
 
 def _hash(payload: dict) -> str:
-    key = payload.get("title", "") + "|" + payload.get("message", "")
+    # text 用 title|message；canvas 无这俩字段时对整包哈希（去重仍生效）
+    if "title" in payload or "message" in payload:
+        key = payload.get("title", "") + "|" + payload.get("message", "")
+    else:
+        import json as _json
+        key = _json.dumps(payload.get("windowData", payload), sort_keys=True,
+                          ensure_ascii=False)
     return hashlib.sha256(key.encode()).hexdigest()[:16]
 
 
@@ -162,6 +170,8 @@ def push_dashboard(snapshot: dict) -> bool:
       status, last_checked
     正常时刷（dedup 生效）；异常态下会被 push_anomaly_alert 的红屏盖过。
     """
+    if USE_CANVAS:
+        return push_dashboard_canvas(snapshot)
     status = snapshot.get("status", "正常")
     normal = snapshot.get("anomaly_count", 0) == 0
     icon = "🛡" if normal else "⚠"
@@ -185,6 +195,9 @@ def push_dashboard(snapshot: dict) -> bool:
 def push_anomaly_alert(device_name: str, event_type: str, risk_score: int,
                        severity: str, incident_id: str, timestamp: str,
                        traffic_line: str = "") -> bool:
+    if USE_CANVAS:
+        return push_anomaly_canvas(device_name, event_type, risk_score, severity,
+                                   incident_id, timestamp, traffic_line)
     sev = (severity or "").upper()
     # 异常翻红时补一行流量尖峰（脱敏聚合），让屏上“看得见被检测的流量”
     body = f"{device_name}\n{event_type}\n\nRisk: {sev} · {risk_score}/100"
@@ -200,6 +213,8 @@ def push_anomaly_alert(device_name: str, event_type: str, risk_score: int,
 
 
 def push_evidence_sealed(incident_id: str) -> bool:
+    if USE_CANVAS:
+        return push_evidence_canvas(incident_id)
     return _post(_text_url(), {
         "title": "EVIDENCE SEALED",
         "message": f"Incident {incident_id}\nHash verified ✓\nChain intact ✓",
@@ -215,6 +230,88 @@ def push_offline_status() -> bool:
         "signature": "Check T5 Core",
         "refreshNow": True,
     }, dedup=False, urgent=True)
+
+
+# ============================================================
+# Canvas 富界面（div/span/img + flex 布局）—— 比纯文字更清晰
+# 需在 Dot App Content Studio 给设备 Loop 任务再加一个「Canvas API」项
+# QUOTE_CANVAS=1 时，下面三个 text 函数自动改走 canvas
+# ============================================================
+def _el(type_: str, children=None, style: dict | None = None, tw: str = "") -> dict:
+    props: dict = {}
+    if tw:
+        props["tw"] = tw
+    if style:
+        props["style"] = style
+    if children is not None:
+        props["children"] = children
+    return {"type": type_, "props": props}
+
+
+def _canvas_payload(root: dict, task_alias: str, link: str | None = None) -> dict:
+    p = {"windowData": {"default": [root]}, "taskAlias": task_alias,
+         "refreshNow": True, "border": 0}
+    if link:
+        p["link"] = link
+    return p
+
+
+def push_dashboard_canvas(snapshot: dict) -> bool:
+    normal = snapshot.get("anomaly_count", 0) == 0
+    accent = "#111" if normal else "#c62828"
+    root = _el("div", style={
+        "display": "flex", "flexDirection": "column", "width": "100%",
+        "height": "100%", "padding": "14px", "backgroundColor": "#fff",
+        "justifyContent": "space-between"}, children=[
+        _el("div", style={"display": "flex", "justifyContent": "space-between",
+                          "alignItems": "center"}, children=[
+            _el("span", "🛡 HOME SHIELD", style={"fontSize": "26px", "fontWeight": "700", "color": "#111"}),
+            _el("span", str(snapshot.get("security_score", 0)), style={
+                "fontSize": "30px", "fontWeight": "800", "color": accent,
+                "border": f"3px solid {accent}", "borderRadius": "10px", "padding": "2px 12px"}),
+        ]),
+        _el("div", style={"display": "flex", "flexDirection": "column", "gap": "4px"}, children=[
+            _el("span", f"{snapshot.get('device_count', 0)} 台设备在线", style={"fontSize": "22px", "color": "#111"}),
+            _el("span", f"↕ 实时流量 {snapshot.get('total_human', '—')}", style={"fontSize": "22px", "color": "#111"}),
+            _el("span", ("✓ 全部正常" if normal else f"⚠ {snapshot.get('status', '')}"),
+                style={"fontSize": "22px", "fontWeight": "700", "color": accent}),
+        ]),
+        _el("span", f"最忙 {snapshot.get('top_talker', '—')} {snapshot.get('top_talker_human', '')} · {snapshot.get('last_checked', '')}",
+            style={"fontSize": "15px", "color": "#666"}),
+    ])
+    return _post(_canvas_url(), _canvas_payload(root, "sentinel-dash"))
+
+
+def push_anomaly_canvas(device_name: str, event_type: str, risk_score: int,
+                        severity: str, incident_id: str, timestamp: str,
+                        traffic_line: str = "") -> bool:
+    sev = (severity or "").upper()
+    root = _el("div", style={
+        "display": "flex", "flexDirection": "column", "width": "100%", "height": "100%",
+        "padding": "14px", "backgroundColor": "#fff", "gap": "3px",
+        "borderLeft": "10px solid #c62828"}, children=[
+        _el("span", f"⚠ {sev} ANOMALY", style={"fontSize": "26px", "fontWeight": "800", "color": "#c62828"}),
+        _el("span", device_name, style={"fontSize": "24px", "fontWeight": "700", "color": "#111"}),
+        _el("span", event_type, style={"fontSize": "20px", "color": "#111"}),
+        _el("span", f"Risk {sev} · {risk_score}/100", style={"fontSize": "20px", "fontWeight": "700", "color": "#c62828"}),
+        _el("span", traffic_line or " ", style={"fontSize": "18px", "color": "#333"}),
+        _el("span", f"{incident_id} · {timestamp}", style={"fontSize": "14px", "color": "#666"}),
+    ])
+    link = f"{DASHBOARD_URL}/incident/{incident_id}" if DASHBOARD_URL else None
+    return _post(_canvas_url(), _canvas_payload(root, "sentinel-alert", link=link), urgent=True)
+
+
+def push_evidence_canvas(incident_id: str) -> bool:
+    root = _el("div", style={
+        "display": "flex", "flexDirection": "column", "width": "100%", "height": "100%",
+        "padding": "14px", "justifyContent": "center", "gap": "6px", "backgroundColor": "#fff"},
+        children=[
+        _el("span", "🔒 EVIDENCE SEALED", style={"fontSize": "26px", "fontWeight": "800", "color": "#1b5e20"}),
+        _el("span", f"Incident {incident_id}", style={"fontSize": "20px", "color": "#111"}),
+        _el("span", "Hash verified ✓  Chain intact ✓", style={"fontSize": "18px", "color": "#111"}),
+        _el("span", "Tamper-proof on hash chain", style={"fontSize": "14px", "color": "#666"}),
+    ])
+    return _post(_canvas_url(), _canvas_payload(root, "sentinel-sealed"), urgent=True)
 
 
 # 从脱敏告警字典一键推送（哨兵 alert pipeline 的统一入口）

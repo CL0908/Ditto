@@ -1,0 +1,139 @@
+{
+  "curve": "P-256",
+  "hash": "SHA-256",
+  "sig_encoding": "DER-base64",
+  "canonical": "DITTO-ALERT-v1 + fixed-order key=value lines (see ditto_alert.canonical_bytes)",
+  "now_for_timestamp_checks": 1784890000,
+  "timestamp_window": 120,
+  "pubkey_uncompressed_hex": "041abe8ab8fb0cb679e58b3080e0d97b64cb3984bf1861e2a502b616dd13d5c5b8a6bd6697a3f7fac94d3ea10b250edccbfcfbb457f7785030c1c4d2b2c366b990",
+  "canonical_of_valid_utf8": "DITTO-ALERT-v1\nschema_version=1\nattestation_type=gateway\nsigner_id=ditto-edge-01\nkey_id=ditto-gw-p256-2026-01\nevent_id=11111111-1111-4111-8111-111111111111\ndevice_id=tp-link-camera-01\nseverity=critical\nmessage=Suspicious outbound traffic detected from the smart home camera\ntimestamp=1784890000\nnonce=AAAAAAAAAAAAAAAAAAAAAA",
+  "vectors": [
+    {
+      "name": "valid",
+      "expect_verify": true,
+      "alert": {
+        "schema_version": 1,
+        "attestation_type": "gateway",
+        "signer_id": "ditto-edge-01",
+        "key_id": "ditto-gw-p256-2026-01",
+        "event_id": "11111111-1111-4111-8111-111111111111",
+        "device_id": "tp-link-camera-01",
+        "severity": "critical",
+        "message": "Suspicious outbound traffic detected from the smart home camera",
+        "timestamp": 1784890000,
+        "nonce": "AAAAAAAAAAAAAAAAAAAAAA",
+        "signature": "MEUCIQCkkJfUK3UvT0e6TNdAZxCZ0Md4FiKf0lxalEdb33w/RAIgNvFiFYm+4H1y1kbuqCzJ9HqBn1i7ZMMKI0g2E8dnM1I="
+      }
+    },
+    {
+      "name": "reordered_keys",
+      "expect_verify": true,
+      "alert": {
+        "signature": "MEUCIQCkkJfUK3UvT0e6TNdAZxCZ0Md4FiKf0lxalEdb33w/RAIgNvFiFYm+4H1y1kbuqCzJ9HqBn1i7ZMMKI0g2E8dnM1I=",
+        "nonce": "AAAAAAAAAAAAAAAAAAAAAA",
+        "timestamp": 1784890000,
+        "message": "Suspicious outbound traffic detected from the smart home camera",
+        "severity": "critical",
+        "device_id": "tp-link-camera-01",
+        "event_id": "11111111-1111-4111-8111-111111111111",
+        "key_id": "ditto-gw-p256-2026-01",
+        "signer_id": "ditto-edge-01",
+        "attestation_type": "gateway",
+        "schema_version": 1
+      }
+    },
+    {
+      "name": "message_tampered",
+      "expect_verify": false,
+      "alert": {
+        "schema_version": 1,
+        "attestation_type": "gateway",
+        "signer_id": "ditto-edge-01",
+        "key_id": "ditto-gw-p256-2026-01",
+        "event_id": "11111111-1111-4111-8111-111111111111",
+        "device_id": "tp-link-camera-01",
+        "severity": "critical",
+        "message": "Suspicious outbound traffic detected from the smart home camerX",
+        "timestamp": 1784890000,
+        "nonce": "AAAAAAAAAAAAAAAAAAAAAA",
+        "signature": "MEUCIQCkkJfUK3UvT0e6TNdAZxCZ0Md4FiKf0lxalEdb33w/RAIgNvFiFYm+4H1y1kbuqCzJ9HqBn1i7ZMMKI0g2E8dnM1I="
+      }
+    },
+    {
+      "name": "signature_tampered",
+      "expect_verify": false,
+      "alert": {
+        "schema_version": 1,
+        "attestation_type": "gateway",
+        "signer_id": "ditto-edge-01",
+        "key_id": "ditto-gw-p256-2026-01",
+        "event_id": "11111111-1111-4111-8111-111111111111",
+        "device_id": "tp-link-camera-01",
+        "severity": "critical",
+        "message": "Suspicious outbound traffic detected from the smart home camera",
+        "timestamp": 1784890000,
+        "nonce": "AAAAAAAAAAAAAAAAAAAAAA",
+        "signature": "MEUCIQCkkJfUK3QvT0e6TNdAZxCZ0Md4FiKf0lxalEdb33w/RAIgNvFiFYm+4H1y1kbuqCzJ9HqBn1i7ZMMKI0g2E8dnM1I="
+      }
+    },
+    {
+      "name": "timestamp_expired",
+      "expect_verify": true,
+      "expect_full": false,
+      "reason": "timestamp",
+      "alert": {
+        "schema_version": 1,
+        "attestation_type": "gateway",
+        "signer_id": "ditto-edge-01",
+        "key_id": "ditto-gw-p256-2026-01",
+        "event_id": "22222222-2222-4222-8222-222222222222",
+        "device_id": "tp-link-camera-01",
+        "severity": "critical",
+        "message": "old alert",
+        "timestamp": 1784880000,
+        "nonce": "BBBBBBBBBBBBBBBBBBBBBB",
+        "signature": "MEUCIQDJnJOyQwJnQGiz48JzpOuchaNbxqXruU2AuW7LG9jk9QIgIztntXOH1XatPCrQxQ0eflIptkBj3pjuiIOpFCFavzs="
+      }
+    },
+    {
+      "name": "replay_same_event_id",
+      "expect_verify": true,
+      "expect_full_first": true,
+      "expect_full_second": false,
+      "reason": "replay",
+      "alert": {
+        "schema_version": 1,
+        "attestation_type": "gateway",
+        "signer_id": "ditto-edge-01",
+        "key_id": "ditto-gw-p256-2026-01",
+        "event_id": "33333333-3333-4333-8333-333333333333",
+        "device_id": "tp-link-camera-01",
+        "severity": "critical",
+        "message": "replay eid",
+        "timestamp": 1784890000,
+        "nonce": "CCCCCCCCCCCCCCCCCCCCCC",
+        "signature": "MEYCIQC+kqTlwxtm2JH8vaYrAgjJGLARglqrmXgzfElHNQvsGgIhAP2OYhLjvHpK/uw35wXdBdhNiAix4WudLMjYdSkNW3JQ"
+      }
+    },
+    {
+      "name": "replay_same_nonce",
+      "expect_verify": true,
+      "expect_full_first": true,
+      "expect_full_second": false,
+      "reason": "replay",
+      "alert": {
+        "schema_version": 1,
+        "attestation_type": "gateway",
+        "signer_id": "ditto-edge-01",
+        "key_id": "ditto-gw-p256-2026-01",
+        "event_id": "44444444-4444-4444-8444-444444444444",
+        "device_id": "tp-link-camera-01",
+        "severity": "critical",
+        "message": "replay nonce",
+        "timestamp": 1784890000,
+        "nonce": "DDDDDDDDDDDDDDDDDDDDDD",
+        "signature": "MEUCIFsGMnBlACtRjSNcEFTCxSFfO0Ja0pNQTpMeowUpkjLOAiEAp9koFjNNIZX8euC3PGeWmWpvD/7EgsSkrPe+lho03+w="
+      }
+    }
+  ]
+}

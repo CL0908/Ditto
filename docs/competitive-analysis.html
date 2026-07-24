@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<title>Ditto 竞品对照</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root{
+    --ground:#f4f6f8; --panel:#ffffff; --ink:#141b26; --muted:#5c6675;
+    --hair:#dbe0e7; --hair-strong:#c3cad4;
+    --seal:#b9781a;            /* 印章金 = 已签名/已存证 */
+    --seal-soft:#f3e6cf;
+    --have:#1f8f6a;            /* 我们有 */
+    --gap:#b64a3c;             /* 竞品缺 */
+    --partial:#b9781a;
+    --ditto-band:#fbf3e4;      /* Ditto 列高亮 */
+    --shadow:0 1px 2px rgba(20,27,38,.06),0 8px 24px rgba(20,27,38,.06);
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:system-ui,-apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --ground:#0d1219; --panel:#141c26; --ink:#e8ecf2; --muted:#8b95a5;
+      --hair:#243040; --hair-strong:#33445a;
+      --seal:#e6ad55; --seal-soft:#2a2113;
+      --have:#3cbf92; --gap:#e0705f; --partial:#e6ad55;
+      --ditto-band:#1b2431;
+      --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="light"]{
+    --ground:#f4f6f8; --panel:#ffffff; --ink:#141b26; --muted:#5c6675;
+    --hair:#dbe0e7; --hair-strong:#c3cad4; --seal:#b9781a; --seal-soft:#f3e6cf;
+    --have:#1f8f6a; --gap:#b64a3c; --partial:#b9781a; --ditto-band:#fbf3e4;
+    --shadow:0 1px 2px rgba(20,27,38,.06),0 8px 24px rgba(20,27,38,.06);
+  }
+  :root[data-theme="dark"]{
+    --ground:#0d1219; --panel:#141c26; --ink:#e8ecf2; --muted:#8b95a5;
+    --hair:#243040; --hair-strong:#33445a; --seal:#e6ad55; --seal-soft:#2a2113;
+    --have:#3cbf92; --gap:#e0705f; --partial:#e6ad55; --ditto-band:#1b2431;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--sans);
+    line-height:1.55;-webkit-font-smoothing:antialiased;font-size:15px}
+  .wrap{max-width:960px;margin:0 auto;padding:clamp(28px,5vw,64px) clamp(18px,4vw,40px)}
+  .eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--seal);font-weight:600;display:flex;align-items:center;gap:10px}
+  .eyebrow::before{content:"";width:22px;height:1.5px;background:var(--seal)}
+  h1{font-size:clamp(27px,4.6vw,42px);line-height:1.12;letter-spacing:-.02em;font-weight:800;
+    margin:.5em 0 .28em;text-wrap:balance;max-width:16ch}
+  .thesis{font-size:clamp(16px,2.3vw,20px);color:var(--ink);max-width:44ch;font-weight:500}
+  .thesis b{color:var(--seal);font-weight:700}
+  .sub{color:var(--muted);max-width:52ch;margin-top:10px;font-size:14.5px}
+
+  section{margin-top:clamp(38px,6vw,60px)}
+  .sec-h{display:flex;align-items:baseline;gap:12px;margin-bottom:16px}
+  .sec-h .n{font-family:var(--mono);font-size:12px;color:var(--seal);font-weight:600}
+  .sec-h h2{font-size:18px;margin:0;letter-spacing:-.01em;font-weight:700}
+  .sec-h .en{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+
+  /* matrix */
+  .scroll{overflow-x:auto;border:1px solid var(--hair);border-radius:14px;box-shadow:var(--shadow);background:var(--panel)}
+  table{border-collapse:collapse;width:100%;min-width:640px;font-size:13.5px}
+  thead th{position:sticky;top:0;background:var(--panel)}
+  th,td{text-align:center;padding:12px 10px;border-bottom:1px solid var(--hair)}
+  tbody tr:last-child td{border-bottom:none}
+  th.cap,td.cap{text-align:left;font-weight:600;color:var(--ink);white-space:normal;min-width:210px}
+  td.cap small{display:block;color:var(--muted);font-weight:400;font-size:11.5px;font-family:var(--mono);letter-spacing:.02em}
+  thead th{font-size:12px;font-weight:700;color:var(--muted);padding-top:16px;padding-bottom:14px}
+  thead th.d{color:var(--seal)}
+  thead th small{display:block;font-family:var(--mono);font-weight:500;font-size:10px;letter-spacing:.05em;color:var(--muted);text-transform:uppercase;margin-top:2px}
+  col.ditto,td.d,th.d{background:var(--ditto-band)}
+  td.d{border-left:1.5px solid var(--seal);border-right:1.5px solid var(--seal)}
+  tbody tr:last-child td.d{border-bottom:1.5px solid var(--seal)}
+  thead th.d{border-top:1.5px solid var(--seal);border-left:1.5px solid var(--seal);border-right:1.5px solid var(--seal);border-radius:10px 10px 0 0}
+  .mk{font-weight:700;font-size:15px}
+  .have{color:var(--have)} .gap{color:var(--gap);opacity:.8} .partial{color:var(--partial)}
+  .legend{display:flex;gap:18px;flex-wrap:wrap;margin-top:12px;font-size:12px;color:var(--muted);font-family:var(--mono)}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+
+  /* competitor cards */
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+  .card{background:var(--panel);border:1px solid var(--hair);border-radius:13px;padding:16px 17px;box-shadow:var(--shadow)}
+  .card h3{margin:0 0 2px;font-size:15.5px;font-weight:700;display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .tag{font-family:var(--mono);font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:20px;white-space:nowrap;font-weight:600}
+  .tag.live{background:var(--seal-soft);color:var(--seal)}
+  .tag.dead{background:transparent;color:var(--muted);border:1px solid var(--hair-strong)}
+  .card .role{font-size:12.5px;color:var(--muted);margin:6px 0 10px}
+  .card .miss{font-size:12.5px;border-top:1px dashed var(--hair-strong);padding-top:9px;color:var(--ink)}
+  .card .miss b{color:var(--gap);font-weight:600}
+
+  /* moat */
+  .moat{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
+  .m{background:var(--panel);border:1px solid var(--hair);border-left:3px solid var(--seal);border-radius:12px;padding:17px 18px;box-shadow:var(--shadow)}
+  .m .k{font-family:var(--mono);font-size:11px;color:var(--seal);letter-spacing:.1em;text-transform:uppercase;font-weight:600}
+  .m h3{margin:7px 0 6px;font-size:17px;font-weight:800;letter-spacing:-.01em}
+  .m p{margin:0;font-size:13px;color:var(--muted)}
+  .m p b{color:var(--ink);font-weight:600}
+
+  .gapbox{background:var(--panel);border:1px solid var(--hair);border-radius:14px;padding:clamp(20px,3vw,28px);box-shadow:var(--shadow);position:relative;overflow:hidden}
+  .gapbox::before{content:"";position:absolute;inset:0 auto 0 0;width:4px;background:linear-gradient(var(--seal),transparent)}
+  .gapbox .lead{font-size:clamp(17px,2.6vw,22px);font-weight:700;letter-spacing:-.01em;text-wrap:balance;max-width:34ch}
+  .gapbox .pos{margin-top:14px;font-size:14.5px;color:var(--muted);max-width:50ch}
+  .gapbox .pos b{color:var(--seal)}
+
+  footer{margin-top:44px;padding-top:18px;border-top:1px solid var(--hair);font-family:var(--mono);
+    font-size:11px;color:var(--muted);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;letter-spacing:.03em}
+  footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="eyebrow">竞品对照 · Competitive Landscape</div>
+  <h1>会签名、能上链、还会开口的家庭安全哨兵</h1>
+  <p class="thesis">别人拦流量;我们 <b>证明真伪 · 链上存证 · 当场播报</b>。</p>
+  <p class="sub">现有家用安全设备是「云端网络防火墙 + 手机 App 告警」。没有一家做到:本地检测 → 密码学证明告警真伪 → 链上钉死证据 → 用人话喊出来。</p>
+
+  <section>
+    <div class="sec-h"><span class="n">01</span><h2>能力对照矩阵</h2><span class="en">capability matrix</span></div>
+    <div class="scroll">
+      <table>
+        <colgroup><col><col><col><col><col class="ditto"></colgroup>
+        <thead>
+          <tr>
+            <th class="cap">能力</th>
+            <th>Firewalla / BOX / CUJO<small>家用防火墙</small></th>
+            <th>AI 安防摄像头<small>Nest · Ring · Wyze</small></th>
+            <th>企业 IoT 安全<small>Armis · Palo Alto</small></th>
+            <th class="d">Ditto<small>本方案</small></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="cap">本地检测,隐私不上厂商云<small>local-first / privacy</small></td><td><span class="mk gap">✕</span></td><td><span class="mk partial">◐</span></td><td><span class="mk gap">✕</span></td><td class="d"><span class="mk have">✓</span></td></tr>
+          <tr><td class="cap">加密网关签名告警<small>防伪造 / 防篡改 / 防重放</small></td><td><span class="mk gap">✕</span></td><td><span class="mk gap">✕</span></td><td><span class="mk gap">✕</span></td><td class="d"><span class="mk have">✓</span></td></tr>
+          <tr><td class="cap">链上防篡改存证<small>取证级 · 厂商删不掉</small></td><td><span class="mk gap">✕</span></td><td><span class="mk gap">✕</span></td><td><span class="mk gap">✕</span></td><td class="d"><span class="mk have">✓</span></td></tr>
+          <tr><td class="cap">物理语音播报<small>真人声 · 不用看手机</small></td><td><span class="mk gap">✕</span></td><td><span class="mk gap">✕</span></td><td><span class="mk gap">✕</span></td><td class="d"><span class="mk have">✓</span></td></tr>
+          <tr><td class="cap">环境墨水屏实时数据 / 告警<small>ambient display</small></td><td><span class="mk gap">✕</span></td><td><span class="mk gap">✕</span></td><td><span class="mk gap">✕</span></td><td class="d"><span class="mk have">✓</span></td></tr>
+          <tr><td class="cap">可解释:说清「为什么是入侵」<small>自然语言</small></td><td><span class="mk gap">✕</span></td><td><span class="mk partial">◐</span></td><td><span class="mk gap">✕</span></td><td class="d"><span class="mk have">✓</span></td></tr>
+          <tr><td class="cap">检测「设备被攻陷 / 外传」<small>非画面入侵</small></td><td><span class="mk have">✓</span></td><td><span class="mk gap">✕</span></td><td><span class="mk have">✓</span></td><td class="d"><span class="mk have">✓</span></td></tr>
+          <tr><td class="cap">开放硬件生态 · 可扩展<small>Tuya T5 / TuyaOpenClaw</small></td><td><span class="mk gap">✕</span></td><td><span class="mk gap">✕</span></td><td><span class="mk partial">◐</span></td><td class="d"><span class="mk have">✓</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="legend">
+      <span><b class="have">✓</b> 具备</span>
+      <span><b class="partial">◐</b> 部分</span>
+      <span><b class="gap">✕</b> 缺失</span>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-h"><span class="n">02</span><h2>直接竞品与硬伤</h2><span class="en">head-to-head</span></div>
+    <div class="cards">
+      <div class="card">
+        <h3>Firewalla <span class="tag live">最强竞品</span></h3>
+        <p class="role">插路由的网络行为分析盒子 + VPN + 家长控制。云端行为分析。</p>
+        <p class="miss">缺:<b>签名 / 链上存证 / 物理输出 / 解释</b>;告警只进手机 App。</p>
+      </div>
+      <div class="card">
+        <h3>Bitdefender BOX <span class="tag live">在售</span></h3>
+        <p class="role">家庭网络防护中枢 + 订阅。Box 2 已停产但仍支持。</p>
+        <p class="miss">缺:<b>云依赖,无存证、无物理告警</b>。</p>
+      </div>
+      <div class="card">
+        <h3>CUJO AI <span class="tag dead">C 端已停产</span></h3>
+        <p class="role">智能防火墙,包元数据传云分析。2021 起转 B2B 卖给 ISP。</p>
+        <p class="miss">缺:<b>元数据上云的隐私争议;已退出消费级</b>。</p>
+      </div>
+      <div class="card">
+        <h3>Fing / Fingbox <span class="tag live">在售</span></h3>
+        <p class="role">网络扫描、设备发现、陌生设备告警。</p>
+        <p class="miss">缺:<b>只做「发现设备」,无深度检测 / 无存证</b>。</p>
+      </div>
+      <div class="card">
+        <h3>Gryphon <span class="tag live">在售</span></h3>
+        <p class="role">带安全的路由器 + AI 威胁防护 + 家长控制。</p>
+        <p class="miss">缺:<b>路由器形态、云依赖,无存证 / 物理输出</b>。</p>
+      </div>
+      <div class="card">
+        <h3>企业 IoT 安全 <span class="tag live">另一赛道</span></h3>
+        <p class="role">Armis · Palo Alto IoT · Ordr。面向企业 / 园区。</p>
+        <p class="miss">缺:<b>重、贵、要部署;非家用、无物理在场感</b>。</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-h"><span class="n">03</span><h2>护城河 = 这三点的组合</h2><span class="en">the moat</span></div>
+    <div class="moat">
+      <div class="m">
+        <div class="k">可信</div>
+        <h3>告警伪造不了</h3>
+        <p>gateway-attested <b>ECDSA P-256</b> 签名。网内攻击者伪造 / 篡改 / 重放告警,T5 一律不播(<b>fail-closed</b>)。别家做不到。</p>
+      </div>
+      <div class="m">
+        <div class="k">不可赖账</div>
+        <h3>证据钉死链上</h3>
+        <p>证据 Merkle 根锚定 <b>Injective</b>,厂商 / 攻击者都删不掉、改不了。消费级安全产品<b>没有一家</b>这么做。</p>
+      </div>
+      <div class="m">
+        <div class="k">在场感</div>
+        <h3>当场开口说话</h3>
+        <p><b>真人语音 + 墨水屏</b>,不用掏手机,还<b>解释为什么</b>。别人拦流量,我们证明 + 存证 + 播报。</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="gapbox">
+      <div class="lead">市场空白:取证级信任 + 物理在场感,是空的。</div>
+      <p class="pos"><b>Ditto 定位 —</b> 会加密签名、能上链取证、还会开口说话的家庭安全哨兵。别人拦流量;我们证明、存证、播报。</p>
+    </div>
+  </section>
+
+  <footer>
+    <span>Ditto · 竞品调研 2026-07</span>
+    <span>Sources: Firewalla · CUJO newsroom · Bitdefender · IoT blockchain logging (MDPI / arXiv)</span>
+  </footer>
+</div>
+
+</body>
+</html>
