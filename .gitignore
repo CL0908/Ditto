@@ -10,7 +10,4 @@ node_modules/
 
 node_modules/
 dist/
-# the Ditto website repo is cloned here as its own repo — keep it separate
-Ditto/
-# local dev screenshots
 screenshot_*.png

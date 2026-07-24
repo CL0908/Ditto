@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>三道防线 · Ditto Sentinel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Unbounded:wght@500;700;900&family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="index.html"><span class="logo-dot"></span>DITTO</a>
+  <div class="nav-links">
+    <a href="why.html">为什么</a>
+    <a href="defense.html" class="active">三道防线</a>
+    <a href="speak.html">它会说话</a>
+    <a href="tito/">主页</a>
+    <a class="btn" href="demo.html">预约演示</a>
+  </div>
+</nav>
+
+<!-- ================= PAGE HERO ================= -->
+<header class="page-hero">
+  <div class="hero-bg-blob blob-a"></div>
+  <div class="hero-bg-blob blob-b"></div>
+  <a class="back-pill" href="index.html">← 返回主页</a>
+  <div class="eyebrow">Three Lines of Defense</div>
+  <h1 class="reveal">三道防线，<br>卡住攻击的每一刻</h1>
+  <p class="hero-sub reveal">Ditto 不是等出事了才报警。它在攻击发生前、发生中、发生后，各设一道防线。</p>
+</header>
+
+<!-- ================= DEFENSE SCENE ================= -->
+<section id="defense">
+  <div class="defense-scene">
+    <svg class="scene-path" viewBox="0 0 1200 260" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M90 60 C 300 220, 420 220, 500 90 S 780 -30, 900 130 S 1050 230, 1140 90"
+            fill="none" stroke="var(--purple-300)" stroke-width="3" stroke-dasharray="2 14" stroke-linecap="round" opacity=".6"/>
+    </svg>
+    <div class="stops">
+      <div class="scene-stop stop-1">
+        <div class="stop-icon">🔒</div>
+        <div class="phase-tape">攻击前</div>
+        <h3>断了它的退路</h3>
+        <p>持续扫描家中每一台联网设备的暴露面，提前封堵弱口令、开放端口与已知漏洞，让攻击者无从下手。</p>
+        <ul class="stop-detail">
+          <li>自动发现家庭网络里的所有联网设备</li>
+          <li>识别默认密码 / 弱口令 / 过期固件</li>
+          <li>标记异常开放的端口和服务</li>
+        </ul>
+      </div>
+      <div class="scene-stop stop-2">
+        <div class="ditto-cameo" aria-hidden="true">
+          <svg viewBox="0 0 240 220" xmlns="http://www.w3.org/2000/svg">
+            <path fill="#FDFBFF" stroke="#E4DAF5" stroke-width="4" d="M120 22 C74 22 44 58 44 104 C44 138 40 158 46 176 C50 188 62 190 70 180 C76 173 84 173 90 181 C96 189 108 189 114 181 C118 176 124 176 128 181 C134 189 146 189 152 181 C158 173 166 173 172 180 C180 190 192 188 196 176 C202 158 196 138 196 104 C196 58 166 22 120 22 Z"/>
+            <circle cx="95" cy="96" r="9" fill="#261C40"/><circle cx="145" cy="96" r="9" fill="#261C40"/><circle cx="148.5" cy="92.5" r="3" fill="#fff"/>
+          </svg>
+        </div>
+        <div class="stop-photo" style="background-image:var(--photo-vac)"></div>
+        <div class="phase-tape">攻击中</div>
+        <h3>认出它的异样</h3>
+        <p>AI 实时学习每台设备的"正常行为"。摄像头半夜向陌生服务器传数据？扫地机器人突然监听麦克风？Ditto 立刻察觉。</p>
+        <ul class="stop-detail">
+          <li>为每台设备建立行为基线</li>
+          <li>检测异常流量方向 / 目标地址</li>
+          <li>秒级触发预警，而不是事后翻日志</li>
+        </ul>
+      </div>
+      <div class="scene-stop stop-3">
+        <div class="stop-photo" style="background-image:var(--photo-cam)"></div>
+        <div class="phase-tape">攻击后</div>
+        <h3>锁死它的痕迹</h3>
+        <p>自动隔离被入侵设备、留存取证记录，并用大白话告诉你发生了什么、该怎么做——而不是一串看不懂的日志。</p>
+        <ul class="stop-detail">
+          <li>自动将异常设备踢出家庭网络</li>
+          <li>保留完整取证记录，方便追溯</li>
+          <li>用人话给出下一步该做什么</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CTA ================= -->
+<section class="cta">
+  <div class="section-label" style="justify-content:center">Next</div>
+  <h2 class="reveal wavy">拦住了，还不够。<br>它得<span class="accent-warm">告诉你。</span></h2>
+  <div class="reveal"><a class="btn warm magnetic" href="speak.html" style="font-size:16px;padding:17px 38px">看它怎么说话 →</a></div>
+</section>
+
+<footer>
+  <span>© 2026 Ditto Sentinel · 守护每一个连接</span>
+  <span>DITTO · AI-Powered IoT Security</span>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
