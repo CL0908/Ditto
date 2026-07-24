@@ -22,14 +22,14 @@
     <br />
     <a href="#系统架构"><strong>查看架构 »</strong></a>
     &middot;
-    <a href="#运行-demo">运行 Demo</a>
+    <a href="#运行-demo">区块链运行 Demo</a>
     &middot;
     <a href="#赛道对应说明">赛道对应</a>
   </p>
 
   <p align="center">
     <sub>Built at AdventureX 2026 · Hangzhou</sub>
-    <sub>https://cl0908.github.io/Ditto/</sub>
+    <sub>产品网页运行 DEMO ：https://cl0908.github.io/Ditto/</sub>
   </p>
 </div>
 
