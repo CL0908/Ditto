@@ -167,21 +167,25 @@ def _run_alert() -> None:
         _fallback_say()
 
 
-def trigger_alert(severity: str = "high") -> None:
+def trigger_alert(severity: str = "high") -> bool:
     """检测到异常时调用。整个进程生命周期只真正播报一次
     （第一条 high severity 异常），后续调用直接跳过——demo 一次产生 6 条告警，
     不能重叠成噪音。非阻塞：发送在后台线程里跑，本函数立即返回。
+
+    返回是否**接管了本次播报**。调用方据此决定要不要走自己的播报路径——
+    T5 只有一个喇叭，同一事件两条路径同时推会撞车（板子端表现为拒绝或崩溃重启）。
     """
     global _fired, _thread
     if severity != "high":
-        return
+        return False
     with _state_lock:
         if _fired:
-            return
+            return False
         _fired = True
         t = threading.Thread(target=_run_alert, name="t5-voice-alert", daemon=True)
         _thread = t
     t.start()
+    return True
 
 
 def wait(timeout: float = 30.0) -> None:

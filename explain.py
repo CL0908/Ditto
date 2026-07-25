@@ -59,6 +59,17 @@ def explain_anomaly(device_id: str, anomaly_type: str, score: float) -> str:
     return f"注意，{name}{behavior}，{why}。风险{pct}分，已为你封存证据。"
 
 
+def device_name(device_id: str) -> str:
+    """公开入口：设备 id → 中文类别名（脱敏）。屏幕与语音共用同一份映射。"""
+    return _device_name(device_id)
+
+
+def behavior_phrase(anomaly_type: str) -> str:
+    """屏幕用的短行为描述——比 explain_anomaly 那句完整播报短，能塞进一行。"""
+    behavior, _ = _ANOMALY_PHRASE.get(anomaly_type, ("出现了异常行为", ""))
+    return behavior
+
+
 def explain_evidence_sealed() -> str:
     return "证据已上链，无法篡改。"
 

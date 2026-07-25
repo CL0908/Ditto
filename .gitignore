@@ -14,3 +14,10 @@ screenshot_*.png
 .env.local
 .env.*.local
 *.local
+.vercel
+.env*
+
+# T5 语音缓存（由 t5_voice.py --generate 生成，可随时重建）
+alert_cn.wav
+# Office 临时锁文件
+~$*

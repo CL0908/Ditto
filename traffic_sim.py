@@ -48,6 +48,17 @@ class HomeTraffic:
         self.rates = dict(devices or _BASELINE)      # device_id -> KB/s
         self.baseline = dict(self.rates)
         self._anomaly_devices: set[str] = set()
+        # 全屋总吞吐的时序，供 Quote/0 画流量波形。只留最近 N 个采样点，
+        # 记的是每次 observe/tick 时的真实总量——不是画图时现编的。
+        from collections import deque
+        self.history: deque[float] = deque(maxlen=48)
+        self.history.append(self.total_kbps())
+
+    def tick(self) -> float:
+        """无事件时也采一个点，让波形有"平稳期"作为尖峰的对比基线。"""
+        v = self.total_kbps()
+        self.history.append(v)
+        return v
 
     def observe(self, device_id: str, anomaly_type: str, score: float) -> float:
         """喂入一个检测事件，更新该设备当前吞吐，返回该设备最新 KB/s。"""
@@ -60,6 +71,7 @@ class HomeTraffic:
             self._anomaly_devices.add(device_id)
         else:
             self._anomaly_devices.discard(device_id)
+        self.history.append(self.total_kbps())
         return self.rates[device_id]
 
     def total_kbps(self) -> float:
@@ -93,6 +105,10 @@ class HomeTraffic:
             "anomaly_count": anomalies,
             "status": "正常" if anomalies == 0 else f"{anomalies} 台异常",
             "last_checked": last_checked,
+            # 每台设备当前吞吐——Quote/0 canvas 用它画流量柱状图（脱敏：只有类别名+速率）
+            "rates": dict(self.rates),
+            # 全屋总吞吐时序——Quote/0 Image API 用它画流量波形
+            "history": list(self.history),
         }
 
 

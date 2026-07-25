@@ -9,13 +9,15 @@ Injective EVM Testnet via the deployed SentinelAnchor contract.
 
 import os
 import sys
+import threading
 from pathlib import Path
 
 from alert_chain import AlertChain, anchor_to_chain
 import mindreset_quote as quote
 import voice_alert as voice
 import explain
-import t5_bridge as t5
+# T5 播报只保留一条路径：固定台词「我能帮你切断电源」，首条 high severity 触发一次。
+# 板子一次只能播一条，两条路径同时推会撞车（拒绝或崩溃重启），所以不并存。
 import t5_voice
 from traffic_sim import HomeTraffic, spike_line
 
@@ -47,18 +49,24 @@ def main():
 
     # 告警输出屏（Quote/0）：未配置 DOT_* 时自动 MOCK（打印不真发）
     quote.configure(env.get("DOT_API_KEY", ""), env.get("DOT_DEVICE_ID", ""),
-                    env.get("DASHBOARD_URL", ""))
+                    env.get("DASHBOARD_URL", ""),
+                    image_api_key=env.get("DOT_IMAGE_API_KEY", ""))
     # 语音播报：预渲染真人音色优先，缺则 say 兜底；VOICE_ENABLED=0 则静音
     voice.configure(env.get("VOICE_ENABLED", "1") not in ("0", "false", ""),
                     env.get("VOICE_LANG", "zh"))
     # T5 DevKit 板载喇叭：串口发 clip 键→板子播烧入的真人声；未连/未就绪自动 no-op
-    t5.configure(env.get("T5_PORT", ""), int(env.get("T5_BAUD", "115200") or 115200),
-                 env.get("T5_ENABLED", "1") not in ("0", "false", ""))
     # T5 板载喇叭（TCP 送 16k wav）：edge-tts 预合成 + 缓存，未配置 T5_IP 自动跳过
-    t5_voice.configure(env.get("T5_IP", ""))
+    t5_voice.configure(env.get("T5_IP", "") or env.get("DITTO_T5_HOST", ""))
+    # 台词是固定的，启动就后台预热——否则首条 high severity 要现场等 edge-tts
+    # 联网合成（实测 14 秒空白）。有缓存时这一步立即返回。
+    threading.Thread(target=t5_voice.generate_and_cache, daemon=True).start()
 
     # 家庭流量态势（确定性模拟；接真设备时换数据源即可）
     traffic = HomeTraffic()
+    # 先采一段平稳期。Quote/0 的流量波形要有"常态"作对比，尖峰才看得出是尖峰；
+    # 这些点是真实的基线总吞吐，不是为了画图编的。
+    for _ in range(16):
+        traffic.tick()
 
     print("=" * 70)
     print("SENTINEL — Tamper-Evident Alert Anchoring Demo")
@@ -94,21 +102,25 @@ def main():
         sev = _severity(score)
         clip = explain.clip_key(anomaly_type)
         traffic_line = spike_line(device_id, kbps, None)
+        snap = traffic.snapshot(str(record.get("timestamp", "")))
         quote.push_anomaly_alert(
-            device_name=device_id,
-            event_type=anomaly_type.replace("_", " "),
+            # 屏上一律中文，且与语音播报共用 explain.py 的同一份脱敏映射
+            device_name=explain.device_name(device_id),
+            event_type=explain.behavior_phrase(anomaly_type),
             risk_score=int(score * 100),
             severity=sev,
             incident_id=f"INC-{record['index']:04d}",
             timestamp=str(record.get("timestamp", "")),
             traffic_line=traffic_line,
+            rates=snap["rates"],            # Canvas 分支画流量柱
+            history=snap["history"],        # Image 分支画流量波形
+            device_id=device_id,
         )
         quote.push_dashboard(traffic.snapshot(str(record.get("timestamp", ""))))
         spoken = explain.explain_anomaly(device_id, anomaly_type, score)
         print(f"       🔊 {spoken}  [{traffic_line}]")
-        t5.speak_anomaly(clip, sev)          # T5 板子亲口播（发 clip 键）
-        voice.speak_anomaly(spoken, sev, clip)  # Mac 兜底（T5 没就绪时也有声）
-        t5_voice.trigger_alert(sev)          # T5 喇叭播报固定台词（只在首条 high severity 触发一次）
+        t5_voice.trigger_alert(sev)             # T5 喇叭：固定台词，只在首条 high 触发
+        voice.speak_anomaly(spoken, sev, clip)  # Mac 兜底（与 T5 并行，互不影响）
 
     is_valid, error = chain.verify()
     print(f"\n  Chain integrity check: {'OK' if is_valid else 'FAILED — ' + error}")
