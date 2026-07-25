@@ -1,3 +1,7 @@
 web3==7.16.0
 eth-account==0.13.7
 cryptography==48.0.0
+
+# T5 语音播报（t5_voice.py）：edge-tts 在线合成 + ffmpeg 转 16k/16bit/mono wav。
+# ffmpeg 本身不是 pip 包，需要 `brew install ffmpeg`（本机已装 8.1.2）。
+edge-tts==7.2.8

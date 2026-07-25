@@ -16,6 +16,7 @@ import mindreset_quote as quote
 import voice_alert as voice
 import explain
 import t5_bridge as t5
+import t5_voice
 from traffic_sim import HomeTraffic, spike_line
 
 
@@ -53,6 +54,8 @@ def main():
     # T5 DevKit 板载喇叭：串口发 clip 键→板子播烧入的真人声；未连/未就绪自动 no-op
     t5.configure(env.get("T5_PORT", ""), int(env.get("T5_BAUD", "115200") or 115200),
                  env.get("T5_ENABLED", "1") not in ("0", "false", ""))
+    # T5 板载喇叭（TCP 送 16k wav）：edge-tts 预合成 + 缓存，未配置 T5_IP 自动跳过
+    t5_voice.configure(env.get("T5_IP", ""))
 
     # 家庭流量态势（确定性模拟；接真设备时换数据源即可）
     traffic = HomeTraffic()
@@ -105,6 +108,7 @@ def main():
         print(f"       🔊 {spoken}  [{traffic_line}]")
         t5.speak_anomaly(clip, sev)          # T5 板子亲口播（发 clip 键）
         voice.speak_anomaly(spoken, sev, clip)  # Mac 兜底（T5 没就绪时也有声）
+        t5_voice.trigger_alert(sev)          # T5 喇叭播报固定台词（只在首条 high severity 触发一次）
 
     is_valid, error = chain.verify()
     print(f"\n  Chain integrity check: {'OK' if is_valid else 'FAILED — ' + error}")
@@ -161,7 +165,8 @@ def main():
     print("any modification to any alert changes the root and breaks verify().")
     print("=" * 70)
 
-    voice.wait()   # 等语音播完再退出，别截断最后一句
+    voice.wait()      # 等语音播完再退出，别截断最后一句
+    t5_voice.wait()   # 等 T5 播报线程跑完再退出
 
 
 if __name__ == "__main__":
