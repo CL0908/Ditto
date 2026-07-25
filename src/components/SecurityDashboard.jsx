@@ -121,7 +121,7 @@ export default function SecurityDashboard() {
     <>
       <header className="hud-top">
         <div className="brand">
-          <a className="btn view-btn back-home" href="../index.html" title="返回 Ditto 网站首页">← 返回首页</a>
+          <a className="btn view-btn back-home" href="../index.html" title="返回 Tito 网站首页">← 返回首页</a>
           <div className="brand-mark"><img src="tito-icon.png" alt="TITO logo" /></div>
           <div>
             <div className="brand-title">TITO <span>· 家庭免疫系统</span></div>

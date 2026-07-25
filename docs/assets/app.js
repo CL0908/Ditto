@@ -1,5 +1,5 @@
 /* ==========================================================
-   DITTO SENTINEL — 共享交互脚本
+   TITO SENTINEL — 共享交互脚本
    关键原则：GSAP 是锦上添花，不是必需品。
    如果 CDN 没加载成功（网络问题/被挡），页面内容必须依然完整可见，
    不能因为一个脚本报错就让整页看起来是空白的。
@@ -14,15 +14,15 @@
     document.documentElement.classList.add('js-anim-ready');
     if (typeof ScrollTrigger !== 'undefined') gsap.registerPlugin(ScrollTrigger);
   } else {
-    console.warn('[Ditto] GSAP 未加载成功，已回退为静态显示（内容仍然完整可见，只是没有动画）。');
+    console.warn('[Tito] GSAP 未加载成功，已回退为静态显示（内容仍然完整可见，只是没有动画）。');
   }
 
   // 小工具：把一段代码包起来，就算这一小块坏了，也不会连累其他功能
   function safe(fn){
-    try { fn(); } catch (e) { console.warn('[Ditto] 某个动效模块出错，已跳过：', e); }
+    try { fn(); } catch (e) { console.warn('[Tito] 某个动效模块出错，已跳过：', e); }
   }
 
-  /* ---------- 标题波浪基线（呼应 Ditto 波浪轮廓的签名细节） ---------- */
+  /* ---------- 标题波浪基线（呼应 Tito 波浪轮廓的签名细节） ---------- */
   safe(function(){
     if (!HAS_GSAP) return;
     function wrapCharsInNode(node){
@@ -66,7 +66,7 @@
     }
   });
 
-  /* ---------- Ditto 呼吸浮动 + 眨眼 + 声波（首页大 ditto） ---------- */
+  /* ---------- Tito 呼吸浮动 + 眨眼 + 声波（首页大 ditto） ---------- */
   safe(function(){
     if(!HAS_GSAP || reduced) return;
     if(!document.getElementById('dittoWrap')) return;
@@ -143,7 +143,7 @@
     }
   });
 
-  /* ---------- Ditto 客串小彩蛋：全站反复出现的浮动摇摆 ---------- */
+  /* ---------- Tito 客串小彩蛋：全站反复出现的浮动摇摆 ---------- */
   safe(function(){
     if(!HAS_GSAP || reduced) return;
     document.querySelectorAll('.ditto-cameo').forEach((el,i)=>{

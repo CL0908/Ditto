@@ -8,7 +8,7 @@
   --header-height: 60px;
   --footer-height: 72px;
 
-  /* palette aligned with the Ditto site (docs/assets/style.css) */
+  /* palette aligned with the Tito site (docs/assets/style.css) */
   --color-primary: #7C5CBF;
   --color-accent-cyan: #4f9dff;
   --color-danger: #E85A6B;
@@ -75,7 +75,7 @@ button {
   flex: 1;
 }
 
-/* back-to-site link (dashboard lives at /tito/ inside the Ditto site) */
+/* back-to-site link (dashboard lives at /tito/ inside the Tito site) */
 .back-home {
   text-decoration: none;
   color: var(--text);

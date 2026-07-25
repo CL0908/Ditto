@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#F1ECFA">
-<title>试玩 Ditto · 点一下，看它怎么反应</title>
+<title>试玩 Tito · 点一下，看它怎么反应</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -24,7 +24,7 @@ body{
   font-family:'Noto Sans SC',-apple-system,sans-serif;
   background:radial-gradient(circle, rgba(124,92,191,.14) 2px, transparent 2.4px) 0 0/30px 30px, var(--lilac);
   color:var(--ink); min-height:100vh;
-  padding-bottom:230px; /* 给底部 Ditto 面板留位置 */
+  padding-bottom:230px; /* 给底部 Tito 面板留位置 */
   overflow-x:hidden;
 }
 
@@ -143,7 +143,7 @@ h1{font-size:23px;font-weight:900;color:var(--purple-900);margin:14px 0 8px;line
   text-decoration:underline;cursor:pointer;padding:8px;
 }
 
-/* ---------- 底部 Ditto 面板 ---------- */
+/* ---------- 底部 Tito 面板 ---------- */
 .dock{
   position:fixed;left:0;right:0;bottom:0;z-index:50;
   background:rgba(241,236,250,.93);
@@ -196,9 +196,9 @@ h1{font-size:23px;font-weight:900;color:var(--purple-900);margin:14px 0 8px;line
 <body>
 
 <header>
-  <div class="brand"><span class="dot"></span>DITTO</div>
+  <div class="brand"><span class="dot"></span>TITO</div>
   <h1>点一下任意设备，<br>假装它被黑了</h1>
-  <p class="sub">看看 Ditto 会怎么反应。记得把手机音量开着——它是真的会开口说话的。</p>
+  <p class="sub">看看 Tito 会怎么反应。记得把手机音量开着——它是真的会开口说话的。</p>
   <button class="sound-toggle" id="soundBtn">🔊 语音已开启</button>
 </header>
 
@@ -210,7 +210,7 @@ h1{font-size:23px;font-weight:900;color:var(--purple-900);margin:14px 0 8px;line
 <div class="devices" id="devices"><!-- JS 生成 --></div>
 
 <div class="log-wrap">
-  <div class="room-label" style="padding:0;margin:0 0 12px">Ditto 的防御日志</div>
+  <div class="room-label" style="padding:0;margin:0 0 12px">Tito 的防御日志</div>
   <div class="log" id="log">
     <div class="log-empty">还没有异常。<br>点上面任意一台设备试试看。</div>
   </div>
@@ -222,13 +222,13 @@ h1{font-size:23px;font-weight:900;color:var(--purple-900);margin:14px 0 8px;line
 
 <div class="foot">
   这是一个演示原型，所有"攻击"都是模拟的<br>
-  <a href="index.html">← 回到 Ditto 主页</a>
+  <a href="index.html">← 回到 Tito 主页</a>
 </div>
 
-<!-- ================= 底部 Ditto ================= -->
+<!-- ================= 底部 Tito ================= -->
 <div class="dock" id="dock">
   <div class="dock-ditto">
-    <svg viewBox="0 0 240 220" xmlns="http://www.w3.org/2000/svg" aria-label="Ditto">
+    <svg viewBox="0 0 240 220" xmlns="http://www.w3.org/2000/svg" aria-label="Tito">
       <g id="dittoBody">
         <path fill="#FDFBFF" stroke="#E4DAF5" stroke-width="4" d="M120 22 C74 22 44 58 44 104 C44 138 40 158 46 176 C50 188 62 190 70 180 C76 173 84 173 90 181 C96 189 108 189 114 181 C118 176 124 176 128 181 C134 189 146 189 152 181 C158 173 166 173 172 180 C180 190 192 188 196 176 C202 158 196 138 196 104 C196 58 166 22 120 22 Z"/>
         <ellipse cx="78" cy="118" rx="12" ry="7" fill="#F3C6DE" opacity=".7"/>
@@ -347,7 +347,7 @@ h1{font-size:23px;font-weight:900;color:var(--purple-900);margin:14px 0 8px;line
         <span class="ico">${d.ico}</span>
         <div class="name">${d.name}</div>
         <div class="state"><span class="led"></span>${st==='hacked' ? d.attack : '正常运行'}</div>
-        <div class="hint">${st==='hacked' ? '再点一下 → 让 Ditto 处理' : '点一下 → 模拟被入侵'}</div>
+        <div class="hint">${st==='hacked' ? '再点一下 → 让 Tito 处理' : '点一下 → 模拟被入侵'}</div>
         <div class="seal">ISOLATED · 已隔离</div>
       `;
       card.addEventListener('click', ()=>onTap(d));
@@ -378,7 +378,7 @@ h1{font-size:23px;font-weight:900;color:var(--purple-900);margin:14px 0 8px;line
     }
 
     if(st === 'hacked'){
-      // 第二下：Ditto 出手处理
+      // 第二下：Tito 出手处理
       state[d.id] = 'isolated';
       renderDevices();
       // 隔离状态的卡片要单独加 class（renderDevices 只处理了 hacked）
@@ -405,7 +405,7 @@ h1{font-size:23px;font-weight:900;color:var(--purple-900);margin:14px 0 8px;line
         card.classList.add('isolated');
         const hint = card.querySelector('.hint');
         const stt  = card.querySelector('.state');
-        if(stt) stt.innerHTML = '<span class="led"></span>已被 Ditto 隔离';
+        if(stt) stt.innerHTML = '<span class="led"></span>已被 Tito 隔离';
         if(hint) hint.textContent = '点一下 → 恢复正常';
       }
     });
