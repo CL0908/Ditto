@@ -6,3 +6,11 @@ __pycache__/
 *.pyc
 .venv/
 .DS_Store
+node_modules/
+
+node_modules/
+dist/
+screenshot_*.png
+.env.local
+.env.*.local
+*.local

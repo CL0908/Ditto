@@ -12,7 +12,7 @@
 <div align="center">
   <img src="img/logo.jpeg" alt="Logo" width="88" height="88">
 
-  <h1 align="center">Ditto · Sentinel</h1>
+  <h1 align="center">TiTO · Sentinel</h1>
 
   <p align="center">
     <b>会开口说话的 AI 安全哨兵</b>
@@ -29,7 +29,8 @@
 
   <p align="center">
     <sub>Built at AdventureX 2026 · Hangzhou</sub><br />
-    <sub>产品网页运行 DEMO ：https://cl0908.github.io/Ditto/</sub>
+    <sub>产品网页运行 DEMO ：https://cl0908.github.io/Ditto/</sub><br />
+    <sub>产品试玩 DEMO ：https://cl0908.github.io/Ditto/play.html</sub>
   </p>
 </div>
 
@@ -63,7 +64,7 @@
 
 > 2025 年，全球有 **15 亿台** IoT 设备被入侵。企业级安全方案家庭用不起，消费级方案检测不了新型攻击，就算检测到了，告警也只是一条没人看的 App 推送。
 >
-> **Ditto 做三件事**，对应攻击发生的三个不同时刻：
+> **TiTO 做三件事**，对应攻击发生的三个不同时刻：
 
 <div align="center">
 
@@ -469,7 +470,7 @@ injscan：    https://injscan.com  → 切换到 Testnet → 粘贴 tx hash
 
 ## 🏆 赛道对应说明
 
-Ditto 是同一个系统，每条赛道看到的是它不同的侧面。
+TiTO 是同一个系统，每条赛道看到的是它不同的侧面。
 
 ---
 
@@ -487,13 +488,41 @@ Ditto 是同一个系统，每条赛道看到的是它不同的侧面。
 
 **AI 是真智能，不是噱头**：35.7 万条记录的验证、四个模型的完整对比、直接改变产品设计的特征重要性分析、676 字节的端侧模型——完整记录在 `sentinel_anomaly_detection.py`。
 
+## 硬件架构：让 TiTO 真正进入家庭 IoT 环境
+
+TiTO 不是单独运行在电脑里的检测脚本，而是一套能够感知家庭设备、持续分析风险，并主动开口提醒用户的家庭安全 Agent。
+
+| 硬件 / 框架 | 在 TiTO 中的角色 |
+|---|---|
+| **T5 Core** | TiTO 的语音交互终端。负责通过板载麦克风与扬声器接收指令、播放安全告警，让 TiTO 从后台程序变成能够主动与用户沟通的家庭安全助手。 |
+| **Tuya Zigbee Gateway THP10-Z** | TiTO 的 Zigbee 设备入口，用于接入传感器、智能插座、灯具等 Zigbee IoT 设备，让系统获得传统网络扫描工具无法直接看到的设备状态与行为信息。 |
+| **Wi-Fi IoT Devices** | TP-Link 摄像头等 Wi-Fi 设备通过家庭局域网连接，由 TiTO 监测其网络流量、在线状态和异常通信行为，而不是通过 Zigbee 直接连接。 |
+| **TuyaOpen / TuyaClaw** | TiTO 的本地 Agent 与硬件运行框架。负责设备通信、事件监听、语音交互和本地任务执行，让系统能够持续运行，而不是等待用户发出指令后才被动响应。 |
+
+### 整体工作流程
+
+```text
+Zigbee 传感器 / 插座 / 灯
+            │
+            ▼
+Tuya Zigbee Gateway ──────┐
+                          │
+TP-Link 摄像头 / Wi-Fi IoT ├──► TiTO 本地安全 Agent
+                          │          │
+家庭网络流量与设备状态 ─────┘          ▼
+                              AI 异常检测与风险分析
+                                       │
+                                       ▼
+                              T5 Core 主动语音告警
+```
+
 ---
 
 ### 清闲智能 · Desktop Daemon —— *陪你一起创造的桌面常驻精灵*
 
 > *"Agent 最好的家不是云，而是一台离你最近、一直醒着的小主机。"*
 
-这句话，就是 Ditto 的产品哲学，一字不差。
+这句话，就是 TiTO 的产品哲学，一字不差。
 
 **它是谁，它替你守住了什么？**
 **一只住在你桌上的守护精灵——它不看你的屏幕、不听你说话，它盯着的是你家里每一台联网设备有没有在偷偷做坏事。**

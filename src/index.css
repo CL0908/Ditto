@@ -1,0 +1,75 @@
+/* Base + in-scene label styles — light pastel theme. All dashboard chrome lives in styles/dashboard.css */
+/* Fonts + palette aligned with the Tito site (docs/assets/style.css): same Google Fonts
+   (Noto Sans SC / Fredoka), same local CJK fallbacks when the CDN is unreachable */
+
+:root {
+  --purple: #7C5CBF;
+  --purple-dim: rgba(124, 92, 191, 0.35);
+  --text: #261C40;
+  --mono: 'Cascadia Mono', 'Consolas', 'Courier New', monospace;
+  --sans: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', system-ui, sans-serif;
+  --display: 'Fredoka', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body, #root { width: 100%; height: 100%; overflow: hidden; background: #c9ccea; }
+
+.app { position: relative; width: 100%; height: 100%; }
+.app canvas { display: block; }
+
+/* ---------------- device tags (in-scene labels) ---------------- */
+.tag-chip {
+  font-family: var(--sans); font-size: 11.5px; font-weight: 600; letter-spacing: 1.6px;
+  padding: 5px 12px; border-radius: 999px; white-space: nowrap;
+  color: var(--text); background: rgba(255, 255, 255, 0.85);
+  border: 1px solid var(--purple-dim); backdrop-filter: blur(6px);
+  box-shadow: 0 2px 14px rgba(61, 43, 99, 0.18);
+  pointer-events: auto; cursor: default; user-select: none; text-transform: uppercase;
+  display: inline-flex; align-items: center;
+}
+/* status text stays collapsed until the chip is hovered */
+.tag-chip .chip-name { margin-left: 6px; }
+.tag-chip .chip-status {
+  max-width: 0; opacity: 0; overflow: hidden; white-space: nowrap;
+  transition: max-width 0.28s ease, opacity 0.22s ease, margin-left 0.28s ease;
+}
+.tag-chip:hover .chip-status { max-width: 240px; opacity: 1; margin-left: 5px; }
+.tag-chip.warn { color: #d64a5b; border-color: rgba(232, 90, 107, 0.55); box-shadow: 0 2px 18px rgba(232, 90, 107, 0.3); animation: chip-pulse 0.9s infinite; }
+.tag-chip.off { color: #9a94b5; border-color: rgba(150, 144, 180, 0.4); box-shadow: none; }
+.tag-chip .g { color: #4C9A7D; }
+.tag-chip .r { color: #E85A6B; }
+
+.net-chip {
+  font-family: var(--mono); font-size: 11px; letter-spacing: 1px;
+  padding: 6px 12px; border-radius: 8px; white-space: nowrap;
+  color: #d64a5b; background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(232, 90, 107, 0.5);
+  box-shadow: 0 2px 18px rgba(232, 90, 107, 0.28);
+  pointer-events: none; user-select: none;
+  animation: chip-pulse 0.8s infinite;
+}
+.net-chip.blue { color: #3578d4; background: rgba(255, 255, 255, 0.85); border-color: rgba(79, 157, 255, 0.45); box-shadow: 0 2px 14px rgba(79, 157, 255, 0.25); animation: none; }
+
+/* ---------------- guardian speech bubble ---------------- */
+/* fixed top-right below the header clock/live-feed; slides left when the inspector opens */
+.guardian-bubble {
+  position: fixed; top: calc(var(--header-height, 60px) + 14px); right: 18px; z-index: 35;
+  width: 320px; max-height: 180px; overflow: hidden; padding: 13px 16px;
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.94), rgba(244, 240, 252, 0.88));
+  border: 1px solid var(--purple-dim); border-radius: 14px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 6px 30px rgba(61, 43, 99, 0.22);
+  font-family: var(--sans); font-size: 13.5px; line-height: 1.6; color: var(--text);
+  pointer-events: none; user-select: none;
+  transition: right 0.3s ease-out;
+}
+.app:has(.inspector.open) .guardian-bubble { right: calc(var(--inspector-width, 320px) + 18px); }
+.guardian-bubble.alert { border-color: rgba(232, 90, 107, 0.55); box-shadow: 0 6px 34px rgba(232, 90, 107, 0.3); color: #a33847; }
+.guardian-bubble .who { font-size: 9.5px; letter-spacing: 2.5px; color: var(--purple); margin-bottom: 5px; text-transform: uppercase; }
+.guardian-bubble.alert .who { color: #E85A6B; }
+.guardian-bubble .cursor { display: inline-block; width: 7px; height: 13px; background: var(--purple); margin-left: 3px; vertical-align: -2px; animation: blink 0.7s steps(1) infinite; }
+
+/* ---------------- animations ---------------- */
+@keyframes chip-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }

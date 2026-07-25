@@ -1,5 +1,5 @@
 /* ==========================================================
-   DITTO SENTINEL — 共享样式表
+   TITO SENTINEL — 共享样式表
    浅紫主题 · 全站页面（index / why / defense / speak / demo）共用
    ========================================================== */
 :root{
@@ -36,7 +36,7 @@ img{max-width:100%}
 .blob-shape-2{border-radius:63% 37% 41% 59% / 51% 46% 54% 49%;}
 .blob-shape-3{border-radius:38% 62% 55% 45% / 60% 42% 58% 40%;}
 
-/* 全站签名元素：反复出现的 Ditto 客串小彩蛋 */
+/* 全站签名元素：反复出现的 Tito 客串小彩蛋 */
 .ditto-cameo{position:absolute;width:74px;z-index:5;pointer-events:none;filter:drop-shadow(0 10px 16px rgba(61,43,99,.22))}
 .ditto-cameo svg{width:100%;display:block}
 
@@ -138,7 +138,7 @@ h1 .accent .char{color:inherit}
 }
 .back-pill:hover{color:var(--purple-700)}
 
-/* ---------- DITTO MASCOT ---------- */
+/* ---------- TITO MASCOT ---------- */
 .ditto-wrap{width:clamp(150px,19vw,230px);margin:8px auto 26px;position:relative}
 .ditto-wrap.small{width:clamp(90px,10vw,120px);margin:0 0 18px}
 .ditto-wrap svg{width:100%;height:auto;display:block;overflow:visible}
